@@ -1,9 +1,5 @@
 <?php
-// Database connection
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "cenro";
+include 'config.php';
 
 $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
