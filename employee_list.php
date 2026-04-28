@@ -1,14 +1,40 @@
 <?php
 include 'config.php';
 $conn = new mysqli($host, $user, $pass, $db);
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Filter
+// --------------------
+// FILTER + SORT
+// --------------------
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'All';
+$sort   = isset($_GET['sort']) ? $_GET['sort'] : 'name_asc';
 
-// Pagination setup
+// --------------------
+// SORT LOGIC
+// --------------------
+$orderBy = "name ASC";
+
+switch ($sort) {
+    case 'name_asc':
+        $orderBy = "name ASC";
+        break;
+    case 'name_desc':
+        $orderBy = "name DESC";
+        break;
+    case 'age_asc':
+        $orderBy = "age ASC";
+        break;
+    case 'age_desc':
+        $orderBy = "age DESC";
+        break;
+}
+
+// --------------------
+// PAGINATION
+// --------------------
 $limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) $page = 1;
@@ -38,6 +64,7 @@ if ($filter === 'Permanent' || $filter === 'Contract of Service') {
         SELECT employee_id, name, age, place_of_assignment, status, image 
         FROM employees 
         WHERE status = ?
+        ORDER BY $orderBy
         LIMIT ? OFFSET ?
     ");
     $stmt->bind_param("sii", $filter, $limit, $offset);
@@ -45,6 +72,7 @@ if ($filter === 'Permanent' || $filter === 'Contract of Service') {
     $stmt = $conn->prepare("
         SELECT employee_id, name, age, place_of_assignment, status, image 
         FROM employees
+        ORDER BY $orderBy
         LIMIT ? OFFSET ?
     ");
     $stmt->bind_param("ii", $limit, $offset);
@@ -125,13 +153,21 @@ $image_url    = "assets/image/employee/";
 <div class="container">
     <h2>List of Employees</h2>
 
-    <!-- Filter -->
+    <!-- FILTER -->
     <form method="GET">
         <label>Show: </label>
         <select name="filter" onchange="this.form.submit()">
             <option value="All" <?= $filter == 'All' ? 'selected' : '' ?>>All</option>
             <option value="Permanent" <?= $filter == 'Permanent' ? 'selected' : '' ?>>Permanent</option>
             <option value="Contract of Service" <?= $filter == 'Contract of Service' ? 'selected' : '' ?>>Contract of Service</option>
+        </select>
+
+        <label>Sort by: </label>
+        <select name="sort" onchange="this.form.submit()">
+            <option value="name_asc" <?= $sort == 'name_asc' ? 'selected' : '' ?>>Name (A-Z)</option>
+            <option value="name_desc" <?= $sort == 'name_desc' ? 'selected' : '' ?>>Name (Z-A)</option>
+            <option value="age_asc" <?= $sort == 'age_asc' ? 'selected' : '' ?>>Age (Low-High)</option>
+            <option value="age_desc" <?= $sort == 'age_desc' ? 'selected' : '' ?>>Age (High-Low)</option>
         </select>
     </form>
 
@@ -185,22 +221,24 @@ $image_url    = "assets/image/employee/";
         </tbody>
     </table>
 
-    <!-- Pagination -->
+    <!-- PAGINATION -->
     <div style="margin-top: 20px; text-align: center;">
+
         <?php if ($page > 1): ?>
-            <a class="btn" href="?filter=<?= $filter ?>&page=<?= $page - 1 ?>">Prev</a>
+            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&page=<?= $page - 1 ?>">Prev</a>
         <?php endif; ?>
 
         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <a class="btn" href="?filter=<?= $filter ?>&page=<?= $i ?>"
+            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&page=<?= $i ?>"
                style="<?= $i == $page ? 'background-color:#333;' : '' ?>">
                 <?= $i ?>
             </a>
         <?php endfor; ?>
 
         <?php if ($page < $totalPages): ?>
-            <a class="btn" href="?filter=<?= $filter ?>&page=<?= $page + 1 ?>">Next</a>
+            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&page=<?= $page + 1 ?>">Next</a>
         <?php endif; ?>
+
     </div>
 
 </div>
