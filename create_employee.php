@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("localhost","root","","cenro");
+include 'config.php';
 if ($conn->connect_error) die("Connection failed");
 
 $image_folder = "assets/image/employee/";
@@ -197,6 +197,11 @@ img{width:50px;height:50px;border-radius:50%}
 <div class="container">
 
 <h2>Employee Management</h2>
+
+<button onclick="window.history.back()" 
+style="background:#6c757d; margin-left:10px;">
+⬅ Go Back
+</button>
 
 <input type="text" id="search" placeholder="🔍 Search...">
 
