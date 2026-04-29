@@ -129,7 +129,7 @@
 
     </form>
 
-    <a href="document_page.php" class="back">← Back to Documents</a>
+    <a href="dashboard.php" class="back">← Back to Documents</a>
 
 </div>
 
