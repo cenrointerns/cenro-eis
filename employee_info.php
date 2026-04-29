@@ -159,6 +159,20 @@ td {
 
 <div class="container">
 
+<div style="padding:15px;">
+    <a href="employee_list.php" style="
+        display:inline-block;
+        padding:8px 14px;
+        background:#4facfe;
+        color:#fff;
+        text-decoration:none;
+        border-radius:6px;
+        font-weight:bold;
+    ">
+        ← Go Back
+    </a>
+</div>
+
     <!-- 📄 DOCUMENT ICON -->
     <div class="doc-icon">
         <a href="employee_document.php?employee_id=<?= $employee_id; ?>" title="View Documents">
