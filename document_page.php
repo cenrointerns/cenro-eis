@@ -31,46 +31,59 @@ h1 {
 
 select {
     display: block;
-    margin: 0 auto 25px auto;
+    margin: 0 auto 20px auto;
     padding: 10px;
     width: 300px;
     border-radius: 8px;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
 }
 
 .card {
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
+    width: 260px;
+    background: rgba(0,0,0,0.78);
     color: white;
-    cursor: pointer;
-    transition: 0.3s;
+    padding: 12px 14px;
+    border-radius: 12px;
     display: none;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.card:hover {
-    transform: translateY(-5px);
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.pds { background:#4e73df; }
-.saln { background:#1cc88a; }
-.ipc { background:#36b9cc; }
-.opc { background:#f6c23e; }
-.ipcr { background:#e74a3b; }
-.opcr { background:#6f42c1; }
-.special { background:#fd7e14; }
-.duty { background:#20c997; }
-.memo { background:#858796; }
-.idp { background:#17a2b8; }
-.appointment { background:#6610f2; }
-.clearance { background:#28a745; }
+.doc-title {
+    font-size: 13px;
+    font-weight: 600;
+}
 
-/* Upload button */
+.btn-group {
+    display: flex;
+    gap: 6px;
+}
+
+.card button {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.view { background:#333; color:white; }
+.edit { background:#f6c23e; }
+.delete { background:red; color:white; }
+
 .upload-btn {
     background:#4e73df;
     color:#fff;
@@ -78,13 +91,6 @@ select {
     padding:10px 14px;
     border-radius:8px;
     cursor:pointer;
-    font-size:14px;
-}
-
-.upload-btn:hover {
-    opacity:0.85;
-    transform: translateY(-2px);
-    transition: 0.2s;
 }
 </style>
 </head>
@@ -93,9 +99,8 @@ select {
 
 <div class="container">
 
-<!-- HEADER WITH UPLOAD BUTTON -->
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-    <h1 style="margin:0;">HR Documents Dashboard</h1>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <h1>HR Documents Dashboard</h1>
 
     <button class="upload-btn" onclick="goToUpload()">
         <i class="fas fa-upload"></i> Upload
@@ -115,30 +120,47 @@ select {
 
 <div class="grid">
 
-    <div class="card pds" id="card-PDS" onclick="openDoc('PDS')"><i class="fas fa-id-card"></i><br>PDS</div>
-    <div class="card saln" id="card-SALN" onclick="openDoc('SALN')"><i class="fas fa-file-invoice-dollar"></i><br>SALN</div>
-    <div class="card ipc" id="card-IPC" onclick="openDoc('IPC')"><i class="fas fa-user-check"></i><br>IPC</div>
-    <div class="card opc" id="card-OPC" onclick="openDoc('OPC')"><i class="fas fa-building"></i><br>OPC</div>
-    <div class="card ipcr" id="card-IPCR" onclick="openDoc('IPCR')"><i class="fas fa-chart-line"></i><br>IPCR</div>
-    <div class="card opcr" id="card-OPCR" onclick="openDoc('OPCR')"><i class="fas fa-chart-bar"></i><br>OPCR</div>
-    <div class="card special" id="card-Special Order" onclick="openDoc('Special Order')"><i class="fas fa-gavel"></i><br>Special Order</div>
-    <div class="card duty" id="card-Reporting for Duty" onclick="openDoc('Reporting for Duty')"><i class="fas fa-briefcase"></i><br>Duty</div>
-    <div class="card memo" id="card-Memorandum" onclick="openDoc('Memorandum')"><i class="fas fa-envelope"></i><br>Memo</div>
-    <div class="card idp" id="card-IDP" onclick="openDoc('IDP')"><i class="fas fa-lightbulb"></i><br>IDP</div>
-    <div class="card appointment" id="card-Appointment" onclick="openDoc('Appointment')"><i class="fas fa-user-tie"></i><br>Appointment</div>
-    <div class="card clearance" id="card-Office Clearance" onclick="openDoc('Office Clearance')"><i class="fas fa-check-circle"></i><br>Clearance</div>
+<?php
+$docs = $conn->query("SELECT DISTINCT document_type FROM documents");
+
+while ($row = $docs->fetch_assoc()) {
+
+    $doc = $row['document_type'];
+    $id = str_replace(" ", "_", $doc);
+
+    echo "
+    <div class='card {$id}' id='card-{$id}'>
+
+        <div class='card-header'>
+            <i class='fas fa-file-alt'></i>
+            <div class='doc-title'>{$doc}</div>
+        </div>
+
+        <div class='btn-group'>
+            <button class='view' onclick=\"openDoc('{$doc}')\">View</button>
+            <button class='edit' onclick=\"editDoc('{$doc}')\">Edit</button>
+            <button class='delete' onclick=\"deleteDoc('{$doc}')\">Delete</button>
+        </div>
+
+    </div>";
+}
+?>
 
 </div>
 </div>
 
 <script>
 
-// Upload redirect
 function goToUpload() {
     window.location.href = "upload_form.php";
 }
 
-// Load document types per employee
+// RESET
+function resetCards() {
+    document.querySelectorAll(".card").forEach(c => c.style.display = "none");
+}
+
+// EMPLOYEE SELECT
 document.getElementById("employeeSelect").addEventListener("change", function () {
 
     const empId = this.value;
@@ -152,46 +174,61 @@ document.getElementById("employeeSelect").addEventListener("change", function ()
         .then(types => {
 
             types.forEach(type => {
-                const card = document.getElementById("card-" + type);
-                if (card) {
-                    card.style.display = "block";
-                }
+                const id = type.replaceAll(" ", "_");
+                const card = document.getElementById("card-" + id);
+                if (card) card.style.display = "flex";
             });
 
         });
 });
 
-function resetCards() {
-    document.querySelectorAll(".card").forEach(card => {
-        card.style.display = "none";
-    });
-}
-
-// Open document
+// VIEW
 function openDoc(type) {
 
     const empId = document.getElementById("employeeSelect").value;
 
-    if (!empId) {
-        alert("Please select an employee first.");
-        return;
-    }
+    if (!empId) return alert("Select employee first");
 
     fetch(`get_document.php?employee_id=${empId}&type=${encodeURIComponent(type)}`)
         .then(res => res.json())
         .then(data => {
-
-            if (!data.file_path) {
-                alert("No document found.");
-                return;
-            }
-
+            if (!data.file_path) return alert("No document found");
             window.open(data.file_path, "_blank");
-
         });
 }
 
-// initial state
+// EDIT (FIXED FLOW)
+function editDoc(type) {
+
+    const empId = document.getElementById("employeeSelect").value;
+
+    if (!empId) return alert("Select employee first");
+
+    window.location.href =
+        `document_edit.php?employee_id=${empId}&type=${encodeURIComponent(type)}`;
+}
+
+// DELETE
+function deleteDoc(type) {
+
+    const empId = document.getElementById("employeeSelect").value;
+
+    if (!empId) return alert("Select employee first");
+
+    if (!confirm("Delete this document?")) return;
+
+    fetch("delete_document.php", {
+        method: "POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: `employee_id=${empId}&type=${encodeURIComponent(type)}`
+    })
+    .then(res => res.text())
+    .then(msg => {
+        alert(msg);
+        location.reload();
+    });
+}
+
 resetCards();
 
 </script>

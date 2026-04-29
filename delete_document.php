@@ -1,40 +1,34 @@
 <?php
 include "config.php";
 
-if (!isset($_GET['id'])) {
-    die("Invalid request.");
-}
+$employee_id = $_POST['employee_id'];
+$type = $_POST['type'];
 
-$id = $_GET['id'];
+// get file path first
+$sql = "SELECT file_path FROM documents 
+        WHERE employee_id=? AND document_type=? LIMIT 1";
 
-/* Get file path first */
-$stmt = $conn->prepare("SELECT file_path FROM documents WHERE id = ?");
-$stmt->bind_param("i", $id);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("is", $employee_id, $type);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows == 0) {
-    die("Document not found.");
-}
+if ($row = $result->fetch_assoc()) {
 
-$row = $result->fetch_assoc();
-$filePath = $row['file_path'];
+    $file = $row['file_path'];
 
-/* Delete from DB */
-$stmt = $conn->prepare("DELETE FROM documents WHERE id = ?");
-$stmt->bind_param("i", $id);
-
-if ($stmt->execute()) {
-
-    // Delete physical file
-    if (file_exists($filePath)) {
-        unlink($filePath);
+    // delete file from server
+    if (file_exists($file)) {
+        unlink($file);
     }
 
-    header("Location: documents.php?deleted=1");
-    exit;
+    // delete DB record
+    $del = $conn->prepare("DELETE FROM documents WHERE employee_id=? AND document_type=?");
+    $del->bind_param("is", $employee_id, $type);
+    $del->execute();
 
+    echo "Document deleted successfully.";
 } else {
-    echo "Error deleting record.";
+    echo "Document not found.";
 }
 ?>
