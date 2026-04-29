@@ -24,9 +24,24 @@ body {
     margin: 40px auto;
 }
 
-h1 {
+/* ✅ NEW DASHBOARD HEADER */
+.header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    grid-column: 2;
     text-align: center;
     color: #333;
+    margin: 0;
+}
+
+.header .upload-btn {
+    grid-column: 3;
+    justify-self: end;
 }
 
 select {
@@ -99,7 +114,8 @@ select {
 
 <div class="container">
 
-<div style="display:flex; justify-content:space-between; align-items:center;">
+<!-- ✅ UPDATED HEADER -->
+<div class="header">
     <h1>HR Documents Dashboard</h1>
 
     <button class="upload-btn" onclick="goToUpload()">
@@ -197,7 +213,7 @@ function openDoc(type) {
         });
 }
 
-// EDIT (FIXED FLOW)
+// EDIT
 function editDoc(type) {
 
     const empId = document.getElementById("employeeSelect").value;
