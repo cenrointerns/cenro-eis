@@ -147,6 +147,32 @@ $image_url    = "assets/image/employee/";
             display: inline-block;
         }
 
+        .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.back-btn {
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+
+.back-btn:hover {
+    background: linear-gradient(135deg, #5a6268, #495057);
+    transform: translateY(-1px);
+}
+
+.back-btn:active {
+    transform: scale(0.98);
+}
+
         .badge {
             padding: 4px 8px;
             border-radius: 5px;
@@ -182,7 +208,10 @@ $image_url    = "assets/image/employee/";
 <body>
 
 <div class="container">
-    <h2>List of Employees</h2>
+        <div class="header">
+        <h2>List of Employees</h2>
+        <a href="dashboard.php" class="back-btn">← Go Back</a>
+    </div>
 
     <!-- FILTER + SEARCH -->
     <form method="GET">
