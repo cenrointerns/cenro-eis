@@ -18,7 +18,7 @@ if (!$employee) {
     die("Employee not found.");
 }
 
-/* DOCUMENTS (FIXED: added document_type) */
+/* DOCUMENTS */
 $stmt2 = $conn->prepare("
     SELECT id, file_name, file_path, document_type, file_type, uploaded_at
     FROM documents
@@ -58,6 +58,27 @@ body {
     border-radius: 12px;
     margin-bottom: 20px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* GO BACK BUTTON */
+.back-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.back-btn:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
 }
 
 /* GRID */
@@ -90,7 +111,7 @@ body {
     margin-bottom: 8px;
 }
 
-/* BADGE */
+/* BADGES */
 .badge {
     display: inline-block;
     font-size: 11px;
@@ -101,7 +122,6 @@ body {
     margin-bottom: 6px;
 }
 
-/* SECOND BADGE */
 .badge.alt {
     background: #fff3cd;
     color: #856404;
@@ -132,20 +152,9 @@ body {
     cursor: pointer;
 }
 
-.view {
-    background: #4facfe;
-    color: white;
-}
-
-.edit {
-    background: #ffc107;
-    color: #000;
-}
-
-.delete {
-    background: #dc3545;
-    color: white;
-}
+.view { background: #4facfe; color: white; }
+.edit { background: #ffc107; color: #000; }
+.delete { background: #dc3545; color: white; }
 
 .empty {
     background: white;
@@ -162,6 +171,11 @@ body {
     <h2 style="margin:0;">
         Documents of <?= htmlspecialchars($employee['name']); ?>
     </h2>
+
+    <!-- GO BACK BUTTON -->
+    <a href="employee_info.php?employee_id=<?= $employee_id; ?>" class="back-btn">
+        ⬅ Go Back
+    </a>
 </div>
 
 <?php if ($result2->num_rows > 0): ?>
@@ -173,7 +187,6 @@ body {
             <div>
                 <div class="filename">📄 <?= htmlspecialchars($row['file_name']); ?></div>
 
-                <!-- FIXED DISPLAY -->
                 <div class="badge">
                     Document: <?= htmlspecialchars($row['document_type'] ?? 'N/A'); ?>
                 </div>
@@ -189,20 +202,17 @@ body {
 
             <div class="actions">
 
-                <!-- VIEW -->
                 <a class="btn view"
                    href="view.php?id=<?= $row['id']; ?>"
                    target="_blank">
                     View
                 </a>
 
-                <!-- EDIT -->
                 <a class="btn edit"
                    href="edit.php?id=<?= $row['id']; ?>">
                     Edit
                 </a>
 
-                <!-- DELETE -->
                 <form method="POST"
                       action="delete.php"
                       onsubmit="return confirm('Delete this document?');"
