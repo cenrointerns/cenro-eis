@@ -49,11 +49,38 @@ body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: #e9f0ea;
+    position: relative;
+}
+
+/* WATERMARK LAYER */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: url("https://upload.wikimedia.org/wikipedia/commons/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 400px;
+
+    opacity: 0.30; /* 🔥 adjust visibility */
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* LAYOUT */
 .dashboard {
     display: flex;
+    position: relative;
+    z-index: 1;
+}
+.sidebar,
+.main-content {
+    position: relative;
+    z-index: 1;
 }
 
 /* SIDEBAR */
