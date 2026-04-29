@@ -41,7 +41,6 @@ $activityResult = $conn->query($activityQuery);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DENR Dashboard</title>
 
-<!-- FONT AWESOME ICONS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -52,7 +51,7 @@ body {
     position: relative;
 }
 
-/* WATERMARK LAYER */
+/* WATERMARK */
 body::before {
     content: "";
     position: fixed;
@@ -66,19 +65,14 @@ body::before {
     background-position: center;
     background-size: 400px;
 
-    opacity: 0.30; /* 🔥 adjust visibility */
+    opacity: 0.30;
     z-index: 0;
     pointer-events: none;
 }
 
-/* LAYOUT */
+/* DASHBOARD LAYOUT */
 .dashboard {
     display: flex;
-    position: relative;
-    z-index: 1;
-}
-.sidebar,
-.main-content {
     position: relative;
     z-index: 1;
 }
@@ -94,7 +88,6 @@ body::before {
     flex-direction: column;
 }
 
-/* LOGO */
 .sidebar-logo {
     display: flex;
     justify-content: center;
@@ -111,7 +104,6 @@ body::before {
     padding: 4px;
 }
 
-/* MENU */
 .sidebar-menu {
     list-style: none;
     padding: 0;
@@ -133,14 +125,12 @@ body::before {
     transition: 0.25s;
 }
 
-/* ICON FIX */
 .sidebar-menu li a i {
     width: 22px;
     text-align: center;
     margin-right: 10px;
 }
 
-/* HOVER */
 .sidebar-menu li a:hover {
     background: rgba(255,255,255,0.15);
     transform: translateX(6px);
@@ -184,7 +174,7 @@ body::before {
     transform: translateY(-5px);
 }
 
-/* ACTIVITY */
+/* ACTIVITY SECTION */
 .activity-section {
     margin-top: 30px;
     background: #fff;
@@ -205,6 +195,52 @@ th, td {
 th {
     background: #f4f4f4;
 }
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background: #fff;
+    width: 350px;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-cancel {
+    padding: 10px 15px;
+    border: none;
+    background: #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-logout {
+    padding: 10px 15px;
+    background: #d9534f;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
 </style>
 </head>
 
@@ -215,12 +251,10 @@ th {
     <!-- SIDEBAR -->
     <div class="sidebar">
 
-        <!-- LOGO -->
         <div class="sidebar-logo">
             <img src="assets/images/denr remv bg.png" alt="DENR Logo">
         </div>
 
-        <!-- MENU -->
         <ul class="sidebar-menu">
 
             <li>
@@ -259,8 +293,9 @@ th {
                 </a>
             </li>
 
+            <!-- LOGOUT -->
             <li>
-                <a href="#" id="logoutBtn">
+                <a href="#" onclick="openLogoutModal(event)">
                     <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </a>
             </li>
@@ -268,7 +303,7 @@ th {
         </ul>
     </div>
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
     <div class="main-content">
 
         <div class="topbar">
@@ -276,6 +311,7 @@ th {
             <span>Welcome, Admin</span>
         </div>
 
+        <!-- CARDS -->
         <div class="cards">
 
             <div class="card">
@@ -295,7 +331,9 @@ th {
 
         </div>
 
+        <!-- ACTIVITY -->
         <div class="activity-section">
+
             <h2>Recent Activity</h2>
 
             <table>
@@ -330,6 +368,63 @@ th {
 
     </div>
 </div>
+
+<!-- LOGOUT MODAL -->
+<div id="logoutModal" class="modal">
+
+    <div class="modal-content">
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to logout?</p>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+
+            <!-- 2 SECOND DELAY LOGOUT -->
+            <a href="#" class="btn-logout" onclick="logoutNow(event)">
+                Yes, Logout
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+function openLogoutModal(event) {
+    event.preventDefault();
+    document.getElementById("logoutModal").style.display = "block";
+}
+
+function closeLogoutModal() {
+    document.getElementById("logoutModal").style.display = "none";
+}
+
+window.onclick = function(event) {
+    let modal = document.getElementById("logoutModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+}
+
+/* LOGOUT WITH 2 SECOND DELAY */
+function logoutNow(event) {
+    event.preventDefault();
+
+    let modal = document.getElementById("logoutModal");
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Logging out...</h3>
+            <p>Please wait 2 seconds...</p>
+        </div>
+    `;
+
+    setTimeout(() => {
+        window.location.href = "logout.php";
+    }, 2000);
+}
+</script>
 
 </body>
 </html>
