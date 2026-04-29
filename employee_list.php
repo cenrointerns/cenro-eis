@@ -7,10 +7,11 @@ if ($conn->connect_error) {
 }
 
 // --------------------
-// FILTER + SORT
+// FILTER + SORT + SEARCH
 // --------------------
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'All';
 $sort   = isset($_GET['sort']) ? $_GET['sort'] : 'name_asc';
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 // --------------------
 // SORT LOGIC
@@ -18,9 +19,6 @@ $sort   = isset($_GET['sort']) ? $_GET['sort'] : 'name_asc';
 $orderBy = "name ASC";
 
 switch ($sort) {
-    case 'name_asc':
-        $orderBy = "name ASC";
-        break;
     case 'name_desc':
         $orderBy = "name DESC";
         break;
@@ -42,13 +40,42 @@ if ($page < 1) $page = 1;
 $offset = ($page - 1) * $limit;
 
 // --------------------
+// BUILD WHERE CLAUSE DYNAMICALLY
+// --------------------
+$where = [];
+$params = [];
+$types = "";
+
+// Filter
+if ($filter === 'Permanent' || $filter === 'Contract of Service') {
+    $where[] = "status = ?";
+    $params[] = $filter;
+    $types .= "s";
+}
+
+// Search
+if (!empty($search)) {
+    $where[] = "(name LIKE ? OR place_of_assignment LIKE ?)";
+    $searchParam = "%$search%";
+    $params[] = $searchParam;
+    $params[] = $searchParam;
+    $types .= "ss";
+}
+
+// Combine WHERE
+$whereSQL = "";
+if (!empty($where)) {
+    $whereSQL = "WHERE " . implode(" AND ", $where);
+}
+
+// --------------------
 // COUNT QUERY
 // --------------------
-if ($filter === 'Permanent' || $filter === 'Contract of Service') {
-    $countStmt = $conn->prepare("SELECT COUNT(*) as total FROM employees WHERE status = ?");
-    $countStmt->bind_param("s", $filter);
-} else {
-    $countStmt = $conn->prepare("SELECT COUNT(*) as total FROM employees");
+$countSql = "SELECT COUNT(*) as total FROM employees $whereSQL";
+$countStmt = $conn->prepare($countSql);
+
+if (!empty($params)) {
+    $countStmt->bind_param($types, ...$params);
 }
 
 $countStmt->execute();
@@ -57,26 +84,25 @@ $totalRows = $countResult->fetch_assoc()['total'];
 $totalPages = ceil($totalRows / $limit);
 
 // --------------------
-// MAIN QUERY (UPDATED)
+// MAIN QUERY
 // --------------------
-if ($filter === 'Permanent' || $filter === 'Contract of Service') {
-    $stmt = $conn->prepare("
-        SELECT employee_id, name, date_of_birth, place_of_assignment, status, image 
-        FROM employees 
-        WHERE status = ?
-        ORDER BY $orderBy
-        LIMIT ? OFFSET ?
-    ");
-    $stmt->bind_param("sii", $filter, $limit, $offset);
-} else {
-    $stmt = $conn->prepare("
-        SELECT employee_id, name, date_of_birth, place_of_assignment, status, image 
-        FROM employees
-        ORDER BY $orderBy
-        LIMIT ? OFFSET ?
-    ");
-    $stmt->bind_param("ii", $limit, $offset);
-}
+$sql = "
+    SELECT employee_id, name, date_of_birth, place_of_assignment, status, image 
+    FROM employees
+    $whereSQL
+    ORDER BY $orderBy
+    LIMIT ? OFFSET ?
+";
+
+$stmt = $conn->prepare($sql);
+
+// Add limit + offset
+$paramsWithLimit = $params;
+$paramsWithLimit[] = $limit;
+$paramsWithLimit[] = $offset;
+$typesWithLimit = $types . "ii";
+
+$stmt->bind_param($typesWithLimit, ...$paramsWithLimit);
 
 $stmt->execute();
 $result = $stmt->get_result();
@@ -145,6 +171,11 @@ $image_url    = "assets/image/employee/";
         th {
             background-color: #f2f2f2;
         }
+
+        .search-box {
+            padding: 6px;
+            width: 200px;
+        }
     </style>
 </head>
 
@@ -153,22 +184,29 @@ $image_url    = "assets/image/employee/";
 <div class="container">
     <h2>List of Employees</h2>
 
-    <!-- FILTER -->
+    <!-- FILTER + SEARCH -->
     <form method="GET">
+        <label>Search: </label>
+        <input type="text" name="search" class="search-box"
+               value="<?= htmlspecialchars($search) ?>"
+               placeholder="Enter name or place">
+
         <label>Show: </label>
-        <select name="filter" onchange="this.form.submit()">
+        <select name="filter">
             <option value="All" <?= $filter == 'All' ? 'selected' : '' ?>>All</option>
             <option value="Permanent" <?= $filter == 'Permanent' ? 'selected' : '' ?>>Permanent</option>
             <option value="Contract of Service" <?= $filter == 'Contract of Service' ? 'selected' : '' ?>>Contract of Service</option>
         </select>
 
         <label>Sort by: </label>
-        <select name="sort" onchange="this.form.submit()">
+        <select name="sort">
             <option value="name_asc" <?= $sort == 'name_asc' ? 'selected' : '' ?>>Name (A-Z)</option>
             <option value="name_desc" <?= $sort == 'name_desc' ? 'selected' : '' ?>>Name (Z-A)</option>
             <option value="age_asc" <?= $sort == 'age_asc' ? 'selected' : '' ?>>Age (Low-High)</option>
             <option value="age_desc" <?= $sort == 'age_desc' ? 'selected' : '' ?>>Age (High-Low)</option>
         </select>
+
+        <button type="submit" class="btn">Apply</button>
     </form>
 
     <br>
@@ -189,7 +227,6 @@ $image_url    = "assets/image/employee/";
         <tbody>
         <?php while($row = $result->fetch_assoc()): 
 
-            // ✅ CALCULATE AGE
             $age = 'N/A';
             if (!empty($row['date_of_birth'])) {
                 $dob = new DateTime($row['date_of_birth']);
@@ -204,21 +241,15 @@ $image_url    = "assets/image/employee/";
         ?>
             <tr>
                 <td><?= htmlspecialchars($row['employee_id']); ?></td>
-
-                <td>
-                    <img src="<?= $image_url . htmlspecialchars($img_file); ?>">
-                </td>
-
+                <td><img src="<?= $image_url . htmlspecialchars($img_file); ?>"></td>
                 <td><?= htmlspecialchars($row['name']); ?></td>
-                <td><?= htmlspecialchars($age); ?></td>
+                <td><?= $age; ?></td>
                 <td><?= htmlspecialchars($row['place_of_assignment']); ?></td>
-
                 <td>
                     <span class="badge <?= $statusClass ?>">
                         <?= htmlspecialchars($row['status']); ?>
                     </span>
                 </td>
-
                 <td>
                     <a href="employee_info.php?employee_id=<?= $row['employee_id']; ?>" class="btn">
                         View
@@ -233,18 +264,19 @@ $image_url    = "assets/image/employee/";
     <div style="margin-top: 20px; text-align: center;">
 
         <?php if ($page > 1): ?>
-            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&page=<?= $page - 1 ?>">Prev</a>
+            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&search=<?= urlencode($search) ?>&page=<?= $page - 1 ?>">Prev</a>
         <?php endif; ?>
 
         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&page=<?= $i ?>"
+            <a class="btn"
+               href="?filter=<?= $filter ?>&sort=<?= $sort ?>&search=<?= urlencode($search) ?>&page=<?= $i ?>"
                style="<?= $i == $page ? 'background-color:#333;' : '' ?>">
                 <?= $i ?>
             </a>
         <?php endfor; ?>
 
         <?php if ($page < $totalPages): ?>
-            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&page=<?= $page + 1 ?>">Next</a>
+            <a class="btn" href="?filter=<?= $filter ?>&sort=<?= $sort ?>&search=<?= urlencode($search) ?>&page=<?= $page + 1 ?>">Next</a>
         <?php endif; ?>
 
     </div>
