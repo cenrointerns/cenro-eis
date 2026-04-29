@@ -3,13 +3,13 @@ session_start();
 include "config.php";
 
 $error = "";
+$success = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Prepare statement to prevent SQL injection
     $stmt = $conn->prepare("SELECT username, password FROM users WHERE username = ?");
     
     if (!$stmt) {
@@ -23,13 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
-        $dbPassword = $user['password']; // hashed password
 
-        if (password_verify($password, $dbPassword)) {
-            // Password matches
+        if (password_verify($password, $user['password'])) {
             $_SESSION['username'] = $user['username'];
-            header("Location: dashboard.php");
-            exit();
+            $success = true;
         } else {
             $error = "Invalid username or password!";
         }
@@ -45,10 +42,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENRO LOGIN</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CENRO LOGIN</title>
+
+<link rel="stylesheet" href="assets/css/style.css">
+
+<style>
+/* BACKDROP */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* BUBBLE SPINNER */
+.bubble-loader {
+    display: flex;
+    gap: 10px;
+}
+
+.bubble-loader div {
+    width: 15px;
+    height: 15px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: bounce 0.6s infinite alternate;
+}
+
+.bubble-loader div:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.bubble-loader div:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); opacity: 0.6; }
+    to { transform: translateY(-15px); opacity: 1; }
+}
+
+/* SUCCESS TEXT */
+.success-text {
+    color: #00c853;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+</style>
+
 </head>
 <body>
 
@@ -61,6 +108,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <p style="color:red;"><?php echo $error; ?></p>
     <?php endif; ?>
 
+    <!-- SUCCESS STATE -->
+    <?php if ($success): ?>
+        <p class="success-text">Login successful! Redirecting...</p>
+
+        <!-- LOADER -->
+        <div class="loader-overlay" id="loader">
+            <div class="bubble-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+
+        <script>
+            // show loader
+            document.getElementById("loader").style.display = "flex";
+
+            // redirect after 2 seconds
+            setTimeout(function () {
+                window.location.href = "dashboard.php";
+            }, 2000);
+        </script>
+    <?php endif; ?>
+
+    <!-- FORM -->
     <form method="POST">
         <div class="input-group">
             <label>Username</label>
