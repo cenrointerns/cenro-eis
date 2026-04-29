@@ -96,7 +96,8 @@ if($statusFilter){
 $total=$conn->query("SELECT COUNT(*) total FROM employees $where")->fetch_assoc()['total'];
 $totalPages=ceil($total/$limit);
 
-$result=$conn->query("SELECT * FROM employees $where ORDER BY employee_id DESC LIMIT $limit OFFSET $offset");
+/* SORT ALPHABETICALLY */
+$result=$conn->query("SELECT * FROM employees $where ORDER BY name ASC LIMIT $limit OFFSET $offset");
 
 /* EDIT */
 $edit=false;
@@ -145,8 +146,53 @@ button{
     cursor:pointer;
 }
 
-table{width:100%;margin-top:20px}
-th,td{padding:10px;text-align:center}
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+th, td{
+    padding:12px 14px;
+    border-bottom:1px solid #e5e7eb;
+    vertical-align:middle;
+}
+
+/* Header styling */
+th{
+    text-align:left;
+    background:#f8fafc;
+    font-weight:600;
+    color:#374151;
+}
+
+/* Align columns properly */
+td{
+    text-align:left;
+}
+
+/* Center specific columns (ID, Image, Actions) */
+td:nth-child(1),
+td:nth-child(2),
+td:nth-child(5),
+th:nth-child(1),
+th:nth-child(2),
+th:nth-child(5){
+    text-align:center;
+}
+
+/* Hover effect */
+tr:hover{
+    background:#f1f5f9;
+    transition:0.2s;
+}
+
+/* Make name look cleaner */
+td:nth-child(3){
+    font-weight:500;
+    color:#111827;
+}
 tr:hover{background:#f1f5f9;cursor:pointer}
 
 img{width:50px;height:50px;border-radius:50%}
@@ -184,11 +230,20 @@ img{width:50px;height:50px;border-radius:50%}
     font-weight:bold;
 }
 
-/* SUCCESS MODAL */
 #successModal .modal-content{
     width:300px;
     text-align:center;
     padding:25px;
+}
+
+.back-btn {
+    background: #6c757d;
+    margin-left: 10px;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
 }
 </style>
 </head>
@@ -198,12 +253,7 @@ img{width:50px;height:50px;border-radius:50%}
 
 <h2>Employee Management</h2>
 
-<button onclick="window.history.back()" 
-style="background:#6c757d; margin-left:10px;">
-⬅ Go Back
-</button>
-
-<input type="text" id="search" placeholder="🔍 Search...">
+<a href="dashboard.php" class="back-btn">⬅ Go Back</a>
 
 <button onclick="openModal()">+ Add Employee</button>
 
