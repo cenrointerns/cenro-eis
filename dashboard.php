@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 /* =========================
    GET LOGGED IN USER NAME
 ========================= */
-$userName = "Shielah Mae Rapatan"; // fallback
+$userName = "Admin"; // fallback
 
 if (isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
