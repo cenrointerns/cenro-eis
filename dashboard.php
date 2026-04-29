@@ -1,11 +1,33 @@
 <?php
+session_start();
 include 'config.php';
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// DASHBOARD COUNTS
+/* =========================
+   GET LOGGED IN USER NAME
+========================= */
+$userName = "Shielah Mae Rapatan"; // fallback
+
+if (isset($_SESSION['user_id'])) {
+    $userId = $_SESSION['user_id'];
+
+    $userQuery = "SELECT username FROM users WHERE id = ?";
+    $stmt = $conn->prepare($userQuery);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        $userName = $row['username'];
+    }
+}
+
+/* =========================
+   DASHBOARD COUNTS
+========================= */
 $totalQuery = "SELECT COUNT(*) AS total FROM employees";
 $totalResult = $conn->query($totalQuery);
 $totalEmployees = $totalResult->fetch_assoc()['total'] ?? 0;
@@ -18,7 +40,9 @@ $permQuery = "SELECT COUNT(*) AS total FROM employees WHERE status = 'Permanent'
 $permResult = $conn->query($permQuery);
 $permCount = $permResult->fetch_assoc()['total'] ?? 0;
 
-// RECENT ACTIVITY
+/* =========================
+   RECENT ACTIVITY
+========================= */
 $activityQuery = "
 SELECT 
     e.name,
@@ -308,7 +332,7 @@ th {
 
         <div class="topbar">
             <h1>Dashboard</h1>
-            <span>Welcome, Admin</span>
+            <span>Welcome, <?= htmlspecialchars($userName) ?></span>
         </div>
 
         <!-- CARDS -->
