@@ -202,6 +202,8 @@ $image_url    = "assets/image/employee/";
             padding: 6px;
             width: 200px;
         }
+
+        
     </style>
 </head>
 
