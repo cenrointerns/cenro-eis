@@ -25,10 +25,10 @@ switch ($sort) {
         $orderBy = "name DESC";
         break;
     case 'age_asc':
-        $orderBy = "age ASC";
+        $orderBy = "date_of_birth DESC"; // younger first
         break;
     case 'age_desc':
-        $orderBy = "age DESC";
+        $orderBy = "date_of_birth ASC"; // older first
         break;
 }
 
@@ -57,11 +57,11 @@ $totalRows = $countResult->fetch_assoc()['total'];
 $totalPages = ceil($totalRows / $limit);
 
 // --------------------
-// MAIN QUERY
+// MAIN QUERY (UPDATED)
 // --------------------
 if ($filter === 'Permanent' || $filter === 'Contract of Service') {
     $stmt = $conn->prepare("
-        SELECT employee_id, name, age, place_of_assignment, status, image 
+        SELECT employee_id, name, date_of_birth, place_of_assignment, status, image 
         FROM employees 
         WHERE status = ?
         ORDER BY $orderBy
@@ -70,7 +70,7 @@ if ($filter === 'Permanent' || $filter === 'Contract of Service') {
     $stmt->bind_param("sii", $filter, $limit, $offset);
 } else {
     $stmt = $conn->prepare("
-        SELECT employee_id, name, age, place_of_assignment, status, image 
+        SELECT employee_id, name, date_of_birth, place_of_assignment, status, image 
         FROM employees
         ORDER BY $orderBy
         LIMIT ? OFFSET ?
@@ -188,6 +188,14 @@ $image_url    = "assets/image/employee/";
 
         <tbody>
         <?php while($row = $result->fetch_assoc()): 
+
+            // ✅ CALCULATE AGE
+            $age = 'N/A';
+            if (!empty($row['date_of_birth'])) {
+                $dob = new DateTime($row['date_of_birth']);
+                $age = (new DateTime())->diff($dob)->y;
+            }
+
             $img_file = (!empty($row['image']) && file_exists($image_folder . $row['image']))
                 ? $row['image']
                 : 'default.png';
@@ -202,7 +210,7 @@ $image_url    = "assets/image/employee/";
                 </td>
 
                 <td><?= htmlspecialchars($row['name']); ?></td>
-                <td><?= htmlspecialchars($row['age']); ?></td>
+                <td><?= htmlspecialchars($age); ?></td>
                 <td><?= htmlspecialchars($row['place_of_assignment']); ?></td>
 
                 <td>

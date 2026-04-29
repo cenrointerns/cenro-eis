@@ -1,5 +1,5 @@
 <?php
-$conn=new mysqli("localhost","root","","cenro");
+include 'config.php';
 
 $search=$_GET['search']??"";
 

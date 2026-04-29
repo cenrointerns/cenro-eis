@@ -27,6 +27,24 @@ if (!file_exists($image_path) || empty($employee['image'])) {
     $image_path = 'assets/image/employee/default.png';
 }
 
+// ✅ CALCULATE AGE
+$age = 'N/A';
+if (!empty($employee['date_of_birth'])) {
+    $dob = new DateTime($employee['date_of_birth']);
+    $today = new DateTime();
+    $age = $today->diff($dob)->y;
+}
+
+// ✅ CALCULATE LENGTH OF SERVICE
+$service = 'N/A';
+if (!empty($employee['date_of_appointment'])) {
+    $start = new DateTime($employee['date_of_appointment']);
+    $today = new DateTime();
+    $diff = $today->diff($start);
+
+    $service = $diff->y . " years, " . $diff->m . " months";
+}
+
 $stmt->close();
 $conn->close();
 ?>
@@ -42,8 +60,7 @@ $conn->close();
 body {
     font-family: 'Segoe UI', Tahoma, sans-serif;
 
-    /* 🔥 Background image */
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg/1280px-Logo_of_the_Department_of_Environment_and_Natural_Resources.svg.png'); /* change path here */
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg/1280px-Logo_of_the_Department_of_Environment_and_Natural_Resources.svg.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -123,7 +140,9 @@ td {
         <div class="employee-info">
             <h2><?= htmlspecialchars($employee['name']); ?></h2>
 
-            <p><span>Age:</span> <?= htmlspecialchars($employee['age']); ?></p>
+            <!-- ✅ UPDATED AGE -->
+            <p><span>Age:</span> <?= htmlspecialchars($age); ?></p>
+
             <p><span>Gender:</span> <?= htmlspecialchars($employee['gender'] ?? 'N/A'); ?></p>
             <p><span>Date of Birth:</span> <?= htmlspecialchars($employee['date_of_birth'] ?? 'N/A'); ?></p>
             <p><span>NOSCA Item Number:</span> <?= htmlspecialchars($employee['nosca_item_number'] ?? 'N/A'); ?></p>
@@ -132,7 +151,6 @@ td {
 
             <p><span>Status:</span> <?= htmlspecialchars($employee['status']); ?></p>
 
-            <!-- ✅ REMOVED JOINED -->
         </div>
 
     </div>
@@ -157,7 +175,9 @@ td {
                 <td><?= htmlspecialchars($employee['education'] ?? 'N/A'); ?></td>
                 <td><?= htmlspecialchars($employee['salary_grade'] ?? 'N/A'); ?></td>
                 <td><?= htmlspecialchars($employee['date_of_appointment'] ?? 'N/A'); ?></td>
-                <td><?= htmlspecialchars($employee['length_of_service'] ?? 'N/A'); ?></td>
+
+                <!-- ✅ UPDATED SERVICE -->
+                <td><?= htmlspecialchars($service); ?></td>
             </tr>
         </table>
     </div>
