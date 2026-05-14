@@ -95,7 +95,7 @@ body::before {
 }
 
 /* DASHBOARD LAYOUT */
-.dashboard {
+    .dashboard {
     display: flex;
     position: relative;
     z-index: 1;
@@ -306,8 +306,8 @@ th {
             </li>
 
             <li>
-                <a href="#">
-                    <i class="fa-solid fa-diagram-project"></i> Projects
+                <a href="create_announcements.php">
+                    <i class="fa-solid fa-diagram-project"></i> Announcements
                 </a>
             </li>
 
