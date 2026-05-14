@@ -119,16 +119,23 @@ $image_url    = "assets/image/employee/";
     <link rel="stylesheet" href="assets/css/employee_list.css">
 
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg/1280px-Logo_of_the_Department_of_Environment_and_Natural_Resources.svg.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 20px;
-        }
+       body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-image: url('./assets/images/cenro.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    opacity: 0.3; /* Adjust transparency here */
+    
+    z-index: -1;
+}
 
         img {
             width: 50px;

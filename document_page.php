@@ -11,12 +11,29 @@
 <style>
 body {
     font-family: 'Segoe UI', Tahoma, sans-serif;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg/1280px-Logo_of_the_Department_of_Environment_and_Natural_Resources.svg.png');
+    margin: 0;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Background image with opacity */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-image: url('./assets/images/cenro.jpeg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    margin: 0;
-    padding: 20px;
+
+    opacity: 0.3; /* Adjust transparency here */
+    
+    z-index: -1;
 }
 
 .container {
@@ -35,7 +52,7 @@ body {
 .header h1 {
     grid-column: 2;
     text-align: center;
-    color: #333;
+    color: #1522ad;
     margin: 0;
 }
 

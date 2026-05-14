@@ -8,11 +8,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            margin: 0;
-        }
+       body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background-image: url('./assets/images/cenro.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    opacity: 0.3; /* Adjust transparency here */
+    
+    z-index: -1;
+}
 
         .container {
             max-width: 650px;
