@@ -23,11 +23,19 @@ $stmt2 = $conn->prepare("
     SELECT id, file_name, file_path, document_type, file_type, uploaded_at
     FROM documents
     WHERE employee_id = ?
-    ORDER BY uploaded_at DESC
+    ORDER BY document_type, uploaded_at DESC
 ");
 $stmt2->bind_param("i", $employee_id);
 $stmt2->execute();
 $result2 = $stmt2->get_result();
+
+/* GROUP BY DOCUMENT TYPE */
+$documentsByType = [];
+
+while ($row = $result2->fetch_assoc()) {
+    $type = $row['document_type'] ?? 'Uncategorized';
+    $documentsByType[$type][] = $row;
+}
 
 $stmt->close();
 $stmt2->close();
@@ -64,7 +72,7 @@ body {
     flex-wrap: wrap;
 }
 
-/* GO BACK BUTTON */
+/* BACK BUTTON */
 .back-btn {
     display: inline-block;
     padding: 8px 14px;
@@ -81,81 +89,92 @@ body {
     transform: translateY(-2px);
 }
 
-/* GRID */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-}
-
-/* CARD */
-.card {
-    background: white;
-    border-radius: 14px;
-    padding: 16px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-    transition: 0.2s;
+/* FILE MANAGER */
+.file-manager {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 12px;
 }
 
-.card:hover {
-    transform: translateY(-4px);
+/* FOLDER */
+.folder {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
 }
 
-/* FILE NAME */
-.filename {
+/* FOLDER HEADER */
+.folder-header {
+    padding: 14px;
     font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 8px;
+    cursor: pointer;
+    background: #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* BADGES */
-.badge {
-    display: inline-block;
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    background: #e7f1ff;
-    color: #1d5fd3;
-    margin-bottom: 6px;
+.folder-header:hover {
+    background: #e2e8f0;
 }
 
-.badge.alt {
-    background: #fff3cd;
-    color: #856404;
+/* FOLDER CONTENT */
+.folder-content {
+    display: none;
+    padding: 10px;
+}
+
+/* FILE ITEM */
+.file-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+/* FILE NAME (UPDATED FIX) */
+.file-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.file-link {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.file-link:hover {
+    text-decoration: underline;
 }
 
 /* META */
-.meta {
+.file-meta {
     font-size: 12px;
     color: #666;
-    margin-top: 8px;
 }
 
 /* ACTIONS */
-.actions {
-    margin-top: 15px;
+.file-actions {
+    margin-top: 8px;
     display: flex;
-    gap: 8px;
+    gap: 10px;
+    font-size: 13px;
 }
 
-.btn {
-    flex: 1;
-    text-align: center;
-    padding: 8px;
-    border-radius: 8px;
-    font-size: 13px;
-    text-decoration: none;
+.file-actions a,
+.file-actions button {
+    background: none;
     border: none;
+    color: #1d5fd3;
     cursor: pointer;
 }
 
-.view { background: #4facfe; color: white; }
-.edit { background: #ffc107; color: #000; }
-.delete { background: #dc3545; color: white; }
-
+/* EMPTY */
 .empty {
     background: white;
     padding: 20px;
@@ -172,70 +191,95 @@ body {
         Documents of <?= htmlspecialchars($employee['name']); ?>
     </h2>
 
-    <!-- GO BACK BUTTON -->
     <a href="employee_info.php?employee_id=<?= $employee_id; ?>" class="back-btn">
         ⬅ Go Back
     </a>
 </div>
 
-<?php if ($result2->num_rows > 0): ?>
-<div class="grid">
+<?php if (!empty($documentsByType)): ?>
 
-    <?php while ($row = $result2->fetch_assoc()): ?>
-        <div class="card">
+<div class="file-manager">
 
-            <div>
-                <div class="filename">📄 <?= htmlspecialchars($row['file_name']); ?></div>
+    <?php foreach ($documentsByType as $type => $docs): ?>
 
-                <div class="badge">
-                    Document: <?= htmlspecialchars($row['document_type'] ?? 'N/A'); ?>
-                </div>
+        <div class="folder">
 
-                <div class="badge alt">
-                    File Type: <?= htmlspecialchars($row['file_type'] ?? 'N/A'); ?>
-                </div>
-
-                <div class="meta">
-                    Uploaded: <?= htmlspecialchars($row['uploaded_at']); ?>
-                </div>
+            <!-- Folder Header -->
+            <div class="folder-header" onclick="toggleFolder(this)">
+                📁 <?= htmlspecialchars($type); ?>
+                <span>(<?= count($docs); ?>)</span>
             </div>
 
-            <div class="actions">
+            <!-- Folder Content -->
+            <div class="folder-content">
 
-                <a class="btn view"
-                   href="view.php?id=<?= $row['id']; ?>"
-                   target="_blank">
-                    View
-                </a>
+                <?php foreach ($docs as $row): ?>
+                    <div class="file-item">
 
-                <a class="btn edit"
-                   href="edit.php?id=<?= $row['id']; ?>">
-                    Edit
-                </a>
+                        <!-- FILE NAME (FIXED + CLICKABLE) -->
+                        <div class="file-name">
+                            📄
+                            <a class="file-link"
+                               href="<?= htmlspecialchars($row['file_path']); ?>"
+                               target="_blank">
 
-                <form method="POST"
-                      action="delete.php"
-                      onsubmit="return confirm('Delete this document?');"
-                      style="flex:1;">
+                                <?= htmlspecialchars($row['file_name']); ?>
 
-                    <input type="hidden" name="id" value="<?= $row['id']; ?>">
-                    <input type="hidden" name="employee_id" value="<?= $employee_id ?>">
+                            </a>
+                        </div>
 
-                    <button class="btn delete" type="submit">
-                        Delete
-                    </button>
-                </form>
+                        <div class="file-meta">
+                            <?= htmlspecialchars($row['file_type'] ?? 'N/A'); ?> •
+                            <?= htmlspecialchars($row['uploaded_at']); ?>
+                        </div>
+
+                        <div class="file-actions">
+
+                            <a href="view.php?id=<?= $row['id']; ?>" target="_blank">
+                                View
+                            </a>
+
+                            <a href="edit.php?id=<?= $row['id']; ?>">
+                                Edit
+                            </a>
+
+                            <form method="POST"
+                                  action="delete.php"
+                                  onsubmit="return confirm('Delete this file?');"
+                                  style="display:inline;">
+
+                                <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                                <input type="hidden" name="employee_id" value="<?= $employee_id ?>">
+
+                                <button type="submit">
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                <?php endforeach; ?>
 
             </div>
 
         </div>
-    <?php endwhile; ?>
+
+    <?php endforeach; ?>
 
 </div>
 
 <?php else: ?>
     <div class="empty">No documents found for this employee.</div>
 <?php endif; ?>
+
+<script>
+function toggleFolder(header) {
+    const content = header.nextElementSibling;
+    content.style.display = (content.style.display === "block") ? "none" : "block";
+}
+</script>
 
 </body>
 </html>

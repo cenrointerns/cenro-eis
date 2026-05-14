@@ -23,7 +23,7 @@ if(!isset($_SESSION['employee_id'])){
 
 /* BACKGROUND */
 body {
-    background: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background: url('assets/images/bg_cenro.jpeg') no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -94,7 +94,7 @@ body {
 }
 
 .card h1 {
-    color: #1b5e20;
+    color: #1b5e1fb4;
     margin-bottom: 10px;
 }
 
@@ -142,9 +142,9 @@ body {
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <img src="assets/images/denr remv bg.png" alt="DENR Logo">
+    <img src="assets/images/DENR_logo.png" alt="DENR Logo">
 
-    <h2>DENR SYSTEM</h2>
+    <h2>DENR-CENRO PORTAL</h2>
 
     <a href="#">🏠 Dashboard</a>
         <a href="#">📁 Documents</a>
