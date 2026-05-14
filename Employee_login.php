@@ -148,7 +148,9 @@ if(isset($_POST['login'])){
     <!-- LOGO -->
     <img src="assets/images/DENR_logo.png" class="logo" alt="Logo">
 
-    <h2>DENR-CENRO</h2>
+    <h2>DENR-CENRO
+         Manolo Fortich, Bukidnon </h2>
+
 
     <p class="message"><?php echo $message; ?></p>
 

@@ -1,9 +1,24 @@
 <?php
 session_start();
+include 'config.php';
 
 if(!isset($_SESSION['employee_id'])){
     header("Location: Employee_login.php");
     exit();
+}
+
+$employee_id = $_SESSION['employee_id'];
+
+// FETCH EMPLOYEE DATA
+$stmt = $conn->prepare("SELECT * FROM employees WHERE employee_id = ?");
+$stmt->bind_param("i", $employee_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$employee = $result->fetch_assoc();
+
+if(!$employee){
+    die("Employee not found!");
 }
 ?>
 
@@ -26,7 +41,6 @@ body {
     background: url('assets/images/cenro.jpeg') no-repeat center center fixed;
     background-size: cover;
     opacity: 800%;
-
 }
 
 /* DARK OVERLAY */
@@ -150,7 +164,7 @@ body {
     <h2>DENR-CENRO PORTAL</h2>
 
     <a href="#">🏠 Dashboard</a>
-        <a href="#">📁 Documents</a>
+    <a href="Employy_docs_view.php">📁 Documents</a>
     <a href="#">📊 News</a>
     <a href="Employee_logout.php">🚪 Logout</a>
 </div>
@@ -159,7 +173,10 @@ body {
 <div class="main">
 
     <div class="card">
-        <h1>Welcome, <?php echo $_SESSION['fullname']; ?>!</h1>
+
+        <!-- ONLY CONTENT CHANGED (NOT DESIGN) -->
+        <h1>Welcome, <?php echo htmlspecialchars($employee['name']); ?>!</h1>
+
         <p>Department of Environment and Natural Resources - Employee Portal</p>
 
         <p>
@@ -167,7 +184,18 @@ body {
             Use the sidebar to navigate through system modules.
         </p>
 
-  
+        <!-- DISPLAY DATA INSIDE SAME CONTENT STYLE -->
+        <p><b>Employee ID:</b> <?php echo $employee['employee_id']; ?></p>
+        <p><b>Age:</b> <?php echo $employee['age']; ?></p>
+        <p><b>Status:</b> <?php echo $employee['status']; ?></p>
+        <p><b>Gender:</b> <?php echo $employee['gender']; ?></p>
+        <p><b>Date of Birth:</b> <?php echo $employee['date_of_birth']; ?></p>
+        <p><b>Position Title:</b> <?php echo $employee['position_title']; ?></p>
+        <p><b>Salary Grade:</b> <?php echo $employee['salary_grade']; ?></p>
+        <p><b>Education:</b> <?php echo $employee['education']; ?></p>
+        <p><b>Assignment:</b> <?php echo $employee['place_of_assignment']; ?></p>
+        <p><b>Length of Service:</b> <?php echo $employee['length_of_service']; ?></p>
+
     </div>
 
 </div>

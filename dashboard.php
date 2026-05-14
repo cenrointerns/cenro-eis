@@ -312,8 +312,8 @@ th {
             </li>
 
             <li>
-                <a href="#">
-                    <i class="fa-solid fa-gear"></i> Settings
+                <a href="change_employee_id.php">
+                    <i class="fa-solid fa-gear"></i> Change ID
                 </a>
             </li>
 
