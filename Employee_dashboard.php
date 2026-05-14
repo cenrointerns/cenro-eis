@@ -23,8 +23,10 @@ if(!isset($_SESSION['employee_id'])){
 
 /* BACKGROUND */
 body {
-    background: url('assets/images/bg_cenro.jpeg') no-repeat center center fixed;
+    background: url('assets/images/cenro.jpeg') no-repeat center center fixed;
     background-size: cover;
+    opacity: 800%;
+
 }
 
 /* DARK OVERLAY */
@@ -32,7 +34,7 @@ body {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: rgba(0, 50, 20, 0.55);
+    background: rgba(252, 255, 255, 0.82);
     z-index: 0;
 }
 
@@ -53,6 +55,7 @@ body {
     width: 80px;
     display: block;
     margin: 0 auto 15px;
+    border-radius: 50%;
 }
 
 .sidebar h2 {

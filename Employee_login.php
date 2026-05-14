@@ -9,7 +9,7 @@ if(isset($_POST['login'])){
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    $query = mysqli_query($conn, "SELECT * FROM employeeslogin WHERE email='$email'");
+    $query = mysqli_query($conn, "SELECT * FROM employees_login WHERE email='$email'");
 
     if(mysqli_num_rows($query) > 0){
 
@@ -42,51 +42,100 @@ if(isset($_POST['login'])){
 
     <style>
 
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
         body{
-            font-family: Arial;
-            background: #f2f2f2;
+            font-family: Arial, sans-serif;
+
+            /* BACKGROUND IMAGE */
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+            url('assets/images/bg_cenro.jpeg');
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height:100vh;
+
+            display:flex;
+            justify-content:center;
+            align-items:center;
         }
 
         .container{
             width:350px;
-            margin:80px auto;
-            background:white;
+            background:rgba(255, 255, 255, 0.15);
             padding:30px;
-            border-radius:10px;
-            box-shadow:0px 0px 10px rgba(0,0,0,0.1);
+            border-radius:15px;
+            box-shadow:0px 0px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
         }
 
         h2{
             text-align:center;
+            margin-bottom:20px;
+             color:white;
         }
 
         input{
             width:100%;
             padding:12px;
             margin-top:10px;
+            border:1px solid #ccc;
+            border-radius:8px;
+            outline:none;
+        }
+
+        input:focus{
+            border-color:#2e7d32;
         }
 
         button{
             width:100%;
             padding:12px;
             margin-top:15px;
-            background:#28a745;
+            background:#2e7d32;
             color:white;
             border:none;
+            border-radius:8px;
             cursor:pointer;
+            font-size:16px;
+            transition:0.3s;
         }
 
         button:hover{
-            background:#1e7e34;
+            background:#1b5e20;
         }
 
         .message{
             text-align:center;
             color:red;
+            margin-bottom:10px;
         }
 
         a{
             text-decoration:none;
+            color:whitesmoke;
+            font-weight:bold;
+        }
+
+        a:hover{
+            text-decoration:underline;
+        }
+
+        .logo{
+            display:block;
+            margin:0 auto 15px;
+            width:90px;
+            height:90px;
+            border-radius:50%;
+            border:4px solid #2e7d32;
+            object-fit:cover;
+            background:white;
+            padding:5px;
         }
 
     </style>
@@ -96,7 +145,10 @@ if(isset($_POST['login'])){
 
 <div class="container">
 
-    <h2>Employee Login</h2>
+    <!-- LOGO -->
+    <img src="assets/images/DENR_logo.png" class="logo" alt="Logo">
+
+    <h2>DENR-CENRO</h2>
 
     <p class="message"><?php echo $message; ?></p>
 
