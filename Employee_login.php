@@ -79,6 +79,13 @@ if(isset($_POST['login'])){
             margin-bottom:20px;
              color:white;
         }
+        p{
+            text-align:center;
+            margin-bottom:20px;
+             color:white;
+        }
+        
+        
 
         input{
             width:100%;
@@ -148,8 +155,8 @@ if(isset($_POST['login'])){
     <!-- LOGO -->
     <img src="assets/images/DENR_logo.png" class="logo" alt="Logo">
 
-    <h2>DENR-CENRO
-         Manolo Fortich, Bukidnon </h2>
+    <h2>Employee Login</h2>
+    <p> DENR-CENRO MANOLO FORTICH</p>
 
 
     <p class="message"><?php echo $message; ?></p>
