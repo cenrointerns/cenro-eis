@@ -25,11 +25,12 @@ $stmt2 = $conn->prepare("
     WHERE employee_id = ?
     ORDER BY document_type, uploaded_at DESC
 ");
+
 $stmt2->bind_param("i", $employee_id);
 $stmt2->execute();
 $result2 = $stmt2->get_result();
 
-/* GROUP BY DOCUMENT TYPE */
+/* GROUP */
 $documentsByType = [];
 
 while ($row = $result2->fetch_assoc()) {
@@ -43,156 +44,263 @@ $conn->close();
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Documents - <?= htmlspecialchars($employee['name']); ?></title>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg/1280px-Logo_of_the_Department_of_Environment_and_Natural_Resources.svg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    margin: 0;
-    padding: 20px;
+
+/* =========================
+   GLOBAL
+========================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
 }
 
-/* HEADER */
-.header {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+body{
+    background:
+        linear-gradient(rgba(240,244,240,0.92), rgba(240,244,240,0.92)),
+        url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Logo_of_the_Department_of_Environment_and_Natural_Resources.svg/1280px-Logo_of_the_Department_of_Environment_and_Natural_Resources.svg.png');
+
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    min-height:100vh;
+    padding:20px;
 }
 
-/* BACK BUTTON */
-.back-btn {
-    display: inline-block;
-    padding: 8px 14px;
-    background: #6c757d;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 13px;
-    transition: 0.2s;
+/* =========================
+   HEADER
+========================= */
+.header{
+    background:white;
+    padding:20px;
+    border-radius:18px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+    animation:fadeIn 0.5s ease;
 }
 
-.back-btn:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
+.header h2{
+    font-size:22px;
+    color:#145a24;
 }
 
-/* FILE MANAGER */
-.file-manager {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+/* =========================
+   BACK BUTTON
+========================= */
+.back-btn{
+    padding:10px 16px;
+    background:#1b5e20;
+    color:white;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:14px;
+    transition:0.3s ease;
 }
 
-/* FOLDER */
-.folder {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    overflow: hidden;
+.back-btn:hover{
+    background:#2e7d32;
+    transform:translateY(-3px);
 }
 
-/* FOLDER HEADER */
-.folder-header {
-    padding: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    background: #f1f5f9;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* =========================
+   FILE MANAGER
+========================= */
+.file-manager{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
 }
 
-.folder-header:hover {
-    background: #e2e8f0;
+/* =========================
+   FOLDER CARD
+========================= */
+.folder{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    transition:0.3s ease;
 }
 
-/* FOLDER CONTENT */
-.folder-content {
-    display: none;
-    padding: 10px;
+.folder:hover{
+    transform:translateY(-3px);
 }
 
-/* FILE ITEM */
-.file-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+/* =========================
+   FOLDER HEADER
+========================= */
+.folder-header{
+    padding:16px;
+    background:linear-gradient(135deg,#145a24,#1b5e20);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:0.3s ease;
 }
 
-.file-item:last-child {
-    border-bottom: none;
+.folder-header:hover{
+    background:linear-gradient(135deg,#1b5e20,#2e7d32);
 }
 
-/* FILE NAME (UPDATED FIX) */
-.file-name {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 4px;
+/* =========================
+   CONTENT (ANIMATED)
+========================= */
+.folder-content{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.4s ease;
+    background:#f9fbf9;
 }
 
-.file-link {
-    color: #1a73e8;
-    text-decoration: none;
-    font-weight: 600;
+/* ACTIVE OPEN */
+.folder.active .folder-content{
+    max-height:800px;
+    overflow-y:auto;
 }
 
-.file-link:hover {
-    text-decoration: underline;
+/* =========================
+   FILE ITEM
+========================= */
+.file-item{
+    padding:15px;
+    border-bottom:1px solid #eaeaea;
+    transition:0.3s ease;
 }
 
-/* META */
-.file-meta {
-    font-size: 12px;
-    color: #666;
+.file-item:hover{
+    background:#eef7ee;
 }
 
-/* ACTIONS */
-.file-actions {
-    margin-top: 8px;
-    display: flex;
-    gap: 10px;
-    font-size: 13px;
+.file-item:last-child{
+    border-bottom:none;
+}
+
+.file-name{
+    font-weight:600;
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    word-break:break-word;
+}
+
+.file-link{
+    color:#1a73e8;
+    text-decoration:none;
+}
+
+.file-link:hover{
+    text-decoration:underline;
+}
+
+/* =========================
+   META
+========================= */
+.file-meta{
+    font-size:12px;
+    color:#666;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+.file-actions{
+    margin-top:10px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
 }
 
 .file-actions a,
-.file-actions button {
-    background: none;
-    border: none;
-    color: #1d5fd3;
-    cursor: pointer;
+.file-actions button{
+    font-size:13px;
+    text-decoration:none;
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:#1b5e20;
+    font-weight:500;
 }
 
-/* EMPTY */
-.empty {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    color: gray;
+.file-actions a:hover,
+.file-actions button:hover{
+    color:#2e7d32;
 }
+
+/* =========================
+   EMPTY
+========================= */
+.empty{
+    background:white;
+    padding:30px;
+    text-align:center;
+    border-radius:15px;
+    color:#777;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   ANIMATION
+========================= */
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media(max-width:768px){
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+
+    .folder-header{
+        font-size:14px;
+    }
+
+    .file-name{
+        font-size:14px;
+    }
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="header">
-    <h2 style="margin:0;">
-        Documents of <?= htmlspecialchars($employee['name']); ?>
-    </h2>
+    <h2>📁 Documents of <?= htmlspecialchars($employee['name']); ?></h2>
 
     <a href="employee_info.php?employee_id=<?= $employee_id; ?>" class="back-btn">
-        ⬅ Go Back
+        ⬅ Back
     </a>
 </div>
 
@@ -204,62 +312,57 @@ body {
 
         <div class="folder">
 
-            <!-- Folder Header -->
             <div class="folder-header" onclick="toggleFolder(this)">
-                📁 <?= htmlspecialchars($type); ?>
-                <span>(<?= count($docs); ?>)</span>
+                📂 <?= htmlspecialchars($type); ?>
+                <span><?= count($docs); ?> files</span>
             </div>
 
-            <!-- Folder Content -->
             <div class="folder-content">
 
                 <?php foreach ($docs as $row): ?>
-                    <div class="file-item">
 
-                        <!-- FILE NAME (FIXED + CLICKABLE) -->
-                        <div class="file-name">
-                            📄
-                            <a class="file-link"
-                               href="<?= htmlspecialchars($row['file_path']); ?>"
-                               target="_blank">
+                <div class="file-item">
 
-                                <?= htmlspecialchars($row['file_name']); ?>
+                    <div class="file-name">
+                        📄
+                        <a class="file-link"
+                           href="<?= htmlspecialchars($row['file_path']); ?>"
+                           target="_blank">
+                            <?= htmlspecialchars($row['file_name']); ?>
+                        </a>
+                    </div>
 
-                            </a>
-                        </div>
+                    <div class="file-meta">
+                        <?= htmlspecialchars($row['file_type']); ?> •
+                        <?= date("F d, Y h:i A", strtotime($row['uploaded_at'])); ?>
+                    </div>
 
-                        <div class="file-meta">
-                            <?= htmlspecialchars($row['file_type'] ?? 'N/A'); ?> •
-                            <?= htmlspecialchars($row['uploaded_at']); ?>
-                        </div>
+                    <div class="file-actions">
 
-                        <div class="file-actions">
+                        <a href="view.php?id=<?= $row['id']; ?>" target="_blank">
+                            View
+                        </a>
 
-                            <a href="view.php?id=<?= $row['id']; ?>" target="_blank">
-                                View
-                            </a>
+                        <a href="edit.php?id=<?= $row['id']; ?>">
+                            Edit
+                        </a>
 
-                            <a href="edit.php?id=<?= $row['id']; ?>">
-                                Edit
-                            </a>
+                        <form method="POST"
+                              action="delete.php"
+                              onsubmit="return confirm('Delete this file?');"
+                              style="display:inline;">
 
-                            <form method="POST"
-                                  action="delete.php"
-                                  onsubmit="return confirm('Delete this file?');"
-                                  style="display:inline;">
+                            <input type="hidden" name="id" value="<?= $row['id']; ?>">
+                            <input type="hidden" name="employee_id" value="<?= $employee_id ?>">
 
-                                <input type="hidden" name="id" value="<?= $row['id']; ?>">
-                                <input type="hidden" name="employee_id" value="<?= $employee_id ?>">
+                            <button type="submit">Delete</button>
 
-                                <button type="submit">
-                                    Delete
-                                </button>
-
-                            </form>
-
-                        </div>
+                        </form>
 
                     </div>
+
+                </div>
+
                 <?php endforeach; ?>
 
             </div>
@@ -271,14 +374,23 @@ body {
 </div>
 
 <?php else: ?>
-    <div class="empty">No documents found for this employee.</div>
+
+<div class="empty">
+    No documents found for this employee.
+</div>
+
 <?php endif; ?>
 
 <script>
-function toggleFolder(header) {
-    const content = header.nextElementSibling;
-    content.style.display = (content.style.display === "block") ? "none" : "block";
+
+/* =========================
+   ACCORDION TOGGLE
+========================= */
+function toggleFolder(header){
+    const folder = header.parentElement;
+    folder.classList.toggle("active");
 }
+
 </script>
 
 </body>

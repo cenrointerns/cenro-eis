@@ -61,7 +61,7 @@ if(!$employee){
             <span>📁</span> Documents
         </a>
 
-        <a href="#">
+        <a href="announcement_fetcher.php">
             <span>📊</span> News
         </a>
 

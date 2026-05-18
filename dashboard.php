@@ -306,7 +306,7 @@ th {
             </li>
 
             <li>
-                <a href="create_announcements.php">
+                <a href="create_announcement.php">
                     <i class="fa-solid fa-diagram-project"></i> Announcements
                 </a>
             </li>
