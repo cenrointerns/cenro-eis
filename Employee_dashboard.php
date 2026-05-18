@@ -23,182 +23,160 @@ if(!$employee){
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DENR Employee Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="assets/css/employee_dashboard.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-/* RESET */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-/* BACKGROUND */
-body {
-    background: url('assets/images/cenro.jpeg') no-repeat center center fixed;
-    background-size: cover;
-    opacity: 800%;
-}
-
-/* DARK OVERLAY */
-.overlay {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: rgba(252, 255, 255, 0.82);
-    z-index: 0;
-}
-
-/* SIDEBAR */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 240px;
-    height: 100%;
-    background: rgba(0, 70, 30, 0.95);
-    color: white;
-    padding: 20px;
-    z-index: 2;
-}
-
-.sidebar img {
-    width: 80px;
-    display: block;
-    margin: 0 auto 15px;
-    border-radius: 50%;
-}
-
-.sidebar h2 {
-    text-align: center;
-    font-size: 18px;
-    margin-bottom: 30px;
-}
-
-.sidebar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    padding: 12px;
-    margin: 8px 0;
-    border-radius: 6px;
-    transition: 0.3s;
-    background: rgba(255,255,255,0.1);
-}
-
-.sidebar a:hover {
-    background: #2e7d32;
-}
-
-/* MAIN CONTENT */
-.main {
-    margin-left: 260px;
-    padding: 40px;
-    position: relative;
-    z-index: 1;
-}
-
-/* DASHBOARD CARD */
-.card {
-    background: rgba(255,255,255,0.92);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    max-width: 600px;
-}
-
-.card h1 {
-    color: #1b5e1fb4;
-    margin-bottom: 10px;
-}
-
-.card p {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-/* BUTTON */
-.logout {
-    display: inline-block;
-    padding: 10px 18px;
-    background: #1b5e20;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: 0.3s;
-}
-
-.logout:hover {
-    background: #2e7d32;
-}
-
-/* RESPONSIVE */
-@media screen and (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        text-align: center;
-    }
-
-    .main {
-        margin-left: 0;
-        padding: 20px;
-    }
-}
-</style>
 
 </head>
 
 <body>
 
 <div class="overlay"></div>
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar">
+    <h2>DENR Portal</h2>
+    <div class="menu-btn" onclick="toggleMenu()">☰</div>
+</div>
 
 <!-- SIDEBAR -->
-<div class="sidebar">
-    <img src="assets/images/DENR_logo.png" alt="DENR Logo">
+<div class="sidebar" id="sidebar">
 
-    <h2>DENR-CENRO PORTAL</h2>
+    <div class="logo-section">
+        <img src="assets/images/DENR_logo.png" alt="DENR Logo">
+        <h2>DENR-CENRO<br>EMPLOYEE PORTAL</h2>
+    </div>
 
-    <a href="#">🏠 Dashboard</a>
-    <a href="Employy_docs_view.php">📁 Documents</a>
-    <a href="#">📊 News</a>
-    <a href="Employee_logout.php">🚪 Logout</a>
+    <div class="nav-links">
+        <a href="#">
+            <span>🏠</span> Dashboard
+        </a>
+
+        <a href="Employee_docs_view.php">
+            <span>📁</span> Documents
+        </a>
+
+        <a href="#">
+            <span>📊</span> News
+        </a>
+
+        <a href="Employee_logout.php">
+            <span>🚪</span> Logout
+        </a>
+    </div>
+
 </div>
 
 <!-- MAIN CONTENT -->
 <div class="main">
 
-    <div class="card">
+    <div class="dashboard-header">
+        <h1>Employee Dashboard</h1>
+        <p>Department of Environment and Natural Resources</p>
+    </div>
 
-        <!-- ONLY CONTENT CHANGED (NOT DESIGN) -->
-        <h1>Welcome, <?php echo htmlspecialchars($employee['name']); ?>!</h1>
-
-        <p>Department of Environment and Natural Resources - Employee Portal</p>
+    <!-- WELCOME -->
+    <div class="welcome-box">
+        <h2>
+            Welcome,
+            <?php echo htmlspecialchars($employee['name']); ?> 👋
+        </h2>
 
         <p>
-            You are now logged in to the official DENR employee dashboard.
-            Use the sidebar to navigate through system modules.
+            You are successfully logged in to the official DENR Employee Portal.
+            Manage your documents, access employee records, and stay updated with announcements.
         </p>
+    </div>
 
-        <!-- DISPLAY DATA INSIDE SAME CONTENT STYLE -->
-        <p><b>Employee ID:</b> <?php echo $employee['employee_id']; ?></p>
-        <p><b>Age:</b> <?php echo $employee['age']; ?></p>
-        <p><b>Status:</b> <?php echo $employee['status']; ?></p>
-        <p><b>Gender:</b> <?php echo $employee['gender']; ?></p>
-        <p><b>Date of Birth:</b> <?php echo $employee['date_of_birth']; ?></p>
-        <p><b>Position Title:</b> <?php echo $employee['position_title']; ?></p>
-        <p><b>Salary Grade:</b> <?php echo $employee['salary_grade']; ?></p>
-        <p><b>Education:</b> <?php echo $employee['education']; ?></p>
-        <p><b>Assignment:</b> <?php echo $employee['place_of_assignment']; ?></p>
-        <p><b>Length of Service:</b> <?php echo $employee['length_of_service']; ?></p>
+    <!-- CARD -->
+    <div class="card">
+
+        <div class="info-grid">
+
+            <div class="info-box">
+                <h3>Employee ID</h3>
+                <p><?php echo $employee['employee_id']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Age</h3>
+                <p><?php echo $employee['age']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Status</h3>
+                <p><?php echo $employee['status']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Gender</h3>
+                <p><?php echo $employee['gender']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Date of Birth</h3>
+                <p><?php echo $employee['date_of_birth']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Position Title</h3>
+                <p><?php echo $employee['position_title']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Salary Grade</h3>
+                <p><?php echo $employee['salary_grade']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Education</h3>
+                <p><?php echo $employee['education']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Assignment</h3>
+                <p><?php echo $employee['place_of_assignment']; ?></p>
+            </div>
+
+            <div class="info-box">
+                <h3>Length of Service</h3>
+                <p><?php echo $employee['length_of_service']; ?></p>
+            </div>
+
+        </div>
 
     </div>
 
 </div>
+
+<script>
+
+function toggleMenu(){
+    document.getElementById("sidebar").classList.toggle("active");
+}
+
+// AUTO CLOSE SIDEBAR ON MOBILE
+document.addEventListener('click', function(event){
+
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.querySelector(".menu-btn");
+
+    if(
+        window.innerWidth <= 991 &&
+        !sidebar.contains(event.target) &&
+        !menuBtn.contains(event.target)
+    ){
+        sidebar.classList.remove("active");
+    }
+
+});
+
+</script>
 
 </body>
 </html>
