@@ -281,13 +281,6 @@ tbody tr:hover{
     background:#23913d;
 }
 
-.download{
-    background:#007bff;
-}
-
-.download:hover{
-    background:#0065d1;
-}
 
 /* =========================
    EMPTY STATE
@@ -550,12 +543,7 @@ tbody tr:hover{
                                         👁 View
                                     </a>
 
-                                    <a
-                                        class="btn download"
-                                        href="view_document.php?id=<?php echo $row['id']; ?>"
-                                    >
-                                        ⬇ Download
-                                    </a>
+                                   
 
                                 </div>
 
@@ -620,12 +608,7 @@ tbody tr:hover{
                             👁 View
                         </a>
 
-                        <a
-                            class="btn download"
-                            href="view_document.php?id=<?php echo $row['id']; ?>"
-                        >
-                            ⬇ Download
-                        </a>
+                       
 
                     </div>
 

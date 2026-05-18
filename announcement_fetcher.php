@@ -119,7 +119,6 @@ body {
     margin-left: 8px;
 }
 
-/* FILE BUTTON */
 .file-btn {
     background: #1565c0;
     color: white;
@@ -209,16 +208,17 @@ body {
         Read More
     </button>
 
+    <!-- ATTACHED FILE BUTTON -->
     <?php if(!empty($row['file_path'])): ?>
-        <a class="btn file-btn" href="<?php echo $row['file_path']; ?>" target="_blank">
-            📎 View File
-        </a>
+        <button class="btn file-btn"
+            data-file="<?php echo htmlspecialchars($row['file_path'], ENT_QUOTES); ?>"
+            onclick="openFile(this)">
+            📎 Attached File
+        </button>
     <?php endif; ?>
 
     <?php if(!$row['is_read']): ?>
-        <button class="btn read-btn" onclick="markRead(<?php echo $row['id']; ?>, this)">
-            Mark as Read
-        </button>
+       
     <?php else: ?>
         <button class="btn read-btn" disabled>✔ Read</button>
     <?php endif; ?>
@@ -267,18 +267,30 @@ function openModal(btn){
     document.getElementById("modalTitle").innerHTML = "🌿 " + title;
     document.getElementById("modalMessage").innerHTML = message.replace(/\n/g, "<br>");
 
+    document.getElementById("modalFile").innerHTML = "";
+    document.getElementById("modal").style.display = "block";
+}
+
+/* NEW: FILE PREVIEW */
+function openFile(btn){
+    let file = btn.getAttribute("data-file");
     let fileBox = document.getElementById("modalFile");
 
-    if(file && file !== "null"){
-        fileBox.innerHTML = `
-            <a href="${file}" target="_blank" class="btn file-btn">
-                📎 Open Attachment
-            </a>
-        `;
-    } else {
-        fileBox.innerHTML = "";
+    let ext = file.split('.').pop().toLowerCase();
+
+    let html = "";
+
+    if(['jpg','jpeg','png','gif','webp'].includes(ext)){
+        html = `<img src="${file}" style="max-width:100%;border-radius:10px;">`;
+    }
+    else if(ext === 'pdf'){
+        html = `<iframe src="${file}" width="100%" height="500px" style="border:none;"></iframe>`;
+    }
+    else {
+        html = `<a href="${file}" target="_blank" class="btn file-btn">⬇ Download File</a>`;
     }
 
+    fileBox.innerHTML = html;
     document.getElementById("modal").style.display = "block";
 }
 
