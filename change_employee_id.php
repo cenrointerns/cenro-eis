@@ -1,7 +1,9 @@
 <?php
 include 'config.php';
 
-// Update employee_id
+$msg = "";
+
+/* UPDATE employee_id */
 if (isset($_POST['update_employee_id'])) {
     $employee_login_id = $_POST['employee_login_id'];
     $employee_id = $_POST['employee_id'];
@@ -16,7 +18,21 @@ if (isset($_POST['update_employee_id'])) {
     }
 }
 
-// Fetch employees
+/* DELETE employee */
+if (isset($_POST['delete_employee'])) {
+    $employee_login_id = $_POST['employee_login_id'];
+
+    $stmt = $conn->prepare("DELETE FROM employees_login WHERE employee_login_id=?");
+    $stmt->bind_param("i", $employee_login_id);
+
+    if ($stmt->execute()) {
+        $msg = "Employee deleted successfully!";
+    } else {
+        $msg = "Failed to delete employee.";
+    }
+}
+
+/* FETCH employees */
 $result = $conn->query("SELECT * FROM employees_login ORDER BY employee_login_id DESC");
 ?>
 
@@ -49,10 +65,6 @@ body{
     box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
 
-.header h2{
-    letter-spacing:1px;
-}
-
 /* CONTAINER */
 .container{
     width:92%;
@@ -73,11 +85,6 @@ body{
     border-radius:15px;
     overflow:hidden;
     box-shadow:0 10px 30px rgba(0,0,0,0.1);
-    transition:0.3s;
-}
-
-.table-card:hover{
-    transform:translateY(-5px);
 }
 
 /* TABLE */
@@ -91,8 +98,6 @@ th{
     color:white;
     padding:15px;
     text-transform:uppercase;
-    font-size:14px;
-    letter-spacing:1px;
 }
 
 td{
@@ -103,7 +108,6 @@ td{
 
 tr:hover{
     background:#f1f8e9;
-    transition:0.3s;
 }
 
 /* BUTTONS */
@@ -123,7 +127,15 @@ button{
 
 .edit-btn:hover{
     background:#2e7d32;
-    transform:scale(1.05);
+}
+
+.delete-btn{
+    background:#e53935;
+    color:white;
+}
+
+.delete-btn:hover{
+    background:#b71c1c;
 }
 
 /* MODAL */
@@ -134,29 +146,14 @@ button{
     width:100%;
     height:100%;
     background:rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
 }
 
-/* MODAL BOX */
 .modal-content{
     background:white;
     width:380px;
     margin:10% auto;
     padding:25px;
     border-radius:15px;
-    animation:pop 0.3s ease;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-}
-
-@keyframes pop{
-    from{transform:scale(0.7); opacity:0;}
-    to{transform:scale(1); opacity:1;}
-}
-
-.modal-content h3{
-    text-align:center;
-    margin-bottom:15px;
-    color:#2e7d32;
 }
 
 /* INPUT */
@@ -166,47 +163,20 @@ input{
     margin:10px 0;
     border:1px solid #ccc;
     border-radius:8px;
-    outline:none;
-    transition:0.3s;
 }
 
-input:focus{
-    border-color:#4caf50;
-    box-shadow:0 0 8px rgba(76,175,80,0.3);
-}
-
-/* SAVE BUTTON */
+/* SAVE */
 .save-btn{
     width:100%;
     background:#43a047;
     color:white;
 }
 
-.save-btn:hover{
-    background:#2e7d32;
-}
-
-/* CANCEL */
 .cancel-btn{
     width:100%;
     margin-top:10px;
     background:#e53935;
     color:white;
-}
-
-.cancel-btn:hover{
-    background:#b71c1c;
-}
-
-/* RESPONSIVE */
-@media(max-width:600px){
-    .modal-content{
-        width:90%;
-    }
-
-    td, th{
-        font-size:12px;
-    }
 }
 </style>
 
@@ -238,6 +208,8 @@ input:focus{
         <td><?php echo $row['fullname']; ?></td>
         <td><?php echo $row['email']; ?></td>
         <td>
+
+            <!-- EDIT -->
             <button class="edit-btn"
                 onclick="openModal(
                     '<?php echo $row['employee_login_id']; ?>',
@@ -245,6 +217,16 @@ input:focus{
                 )">
                 Edit ID
             </button>
+
+            <!-- DELETE -->
+            <form method="POST" style="display:inline;"
+                  onsubmit="return confirm('Are you sure you want to delete this employee?');">
+                <input type="hidden" name="employee_login_id" value="<?php echo $row['employee_login_id']; ?>">
+                <button type="submit" name="delete_employee" class="delete-btn">
+                    Delete
+                </button>
+            </form>
+
         </td>
     </tr>
     <?php } ?>
