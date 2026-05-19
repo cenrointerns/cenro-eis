@@ -87,7 +87,7 @@ $totalPages = ceil($totalRows / $limit);
 // MAIN QUERY
 // --------------------
 $sql = "
-    SELECT employee_id, name, date_of_birth, place_of_assignment, status, image 
+    SELECT employee_id, name, date_of_birth, assigned_section, status, image 
     FROM employees
     $whereSQL
     ORDER BY $orderBy
@@ -256,7 +256,7 @@ $image_url    = "assets/image/employee/";
                 <th>Image</th>
                 <th>Name</th>
                 <th>Age</th>
-                <th>Place of Assignment</th>
+                <th>Assigned Section</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -282,7 +282,7 @@ $image_url    = "assets/image/employee/";
                 <td><img src="<?= $image_url . htmlspecialchars($img_file); ?>"></td>
                 <td><?= htmlspecialchars($row['name']); ?></td>
                 <td><?= $age; ?></td>
-                <td><?= htmlspecialchars($row['place_of_assignment']); ?></td>
+                <td><?= htmlspecialchars($row['assigned_section']); ?></td>
                 <td>
                     <span class="badge <?= $statusClass ?>">
                         <?= htmlspecialchars($row['status']); ?>

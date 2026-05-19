@@ -76,13 +76,27 @@ body {
     position: relative;
 }
 
-/* 📄 DOCUMENT ICON */
+/* BACK BUTTON */
+.back-btn {
+    padding: 15px;
+}
+
+.back-btn a {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #4facfe;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+/* DOCUMENT ICON */
 .doc-icon {
     position: absolute;
     top: 15px;
     right: 15px;
     font-size: 26px;
-    z-index: 10;
 }
 
 .doc-icon a {
@@ -96,6 +110,7 @@ body {
     transform: scale(1.2);
 }
 
+/* HEADER */
 .employee-header {
     display: flex;
     flex-wrap: wrap;
@@ -133,24 +148,69 @@ body {
     font-weight: bold;
 }
 
+/* SECTION TITLE (BLUE HEADER) */
+.section-title {
+    background: linear-gradient(90deg, #4facfe, #00c6ff);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+/* DETAILS GRID */
 .details-section {
     padding: 20px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
 }
 
-th {
-    background: #4facfe;
-    color: #fff;
-    padding: 10px;
+/* DETAIL CARD */
+.detail-item {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
-td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+.detail-item:hover {
+    background: #e6f4ff;
+    border-color: #4facfe;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(79, 172, 254, 0.2);
+}
+
+/* LABEL */
+.detail-item label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+}
+
+/* LABEL HOVER */
+.detail-item:hover label {
+    color: #1e88e5;
+}
+
+/* VALUE */
+.detail-item span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+h3{
+text-align: center;
 }
 </style>
 </head>
@@ -159,21 +219,12 @@ td {
 
 <div class="container">
 
-<div style="padding:15px;">
-    <a href="employee_list.php" style="
-        display:inline-block;
-        padding:8px 14px;
-        background:#4facfe;
-        color:#fff;
-        text-decoration:none;
-        border-radius:6px;
-        font-weight:bold;
-    ">
-        ← Go Back
-    </a>
-</div>
+    <!-- BACK BUTTON -->
+    <div class="back-btn">
+        <a href="employee_list.php">← Go Back</a>
+    </div>
 
-    <!-- 📄 DOCUMENT ICON -->
+    <!-- DOCUMENT ICON -->
     <div class="doc-icon">
         <a href="employee_document.php?employee_id=<?= $employee_id; ?>" title="View Documents">
             📄
@@ -195,36 +246,67 @@ td {
             <p><span>Gender:</span> <?= htmlspecialchars($employee['gender'] ?? 'N/A'); ?></p>
             <p><span>Date of Birth:</span> <?= htmlspecialchars($employee['date_of_birth'] ?? 'N/A'); ?></p>
             <p><span>NOSCA Item Number:</span> <?= htmlspecialchars($employee['nosca_item_number'] ?? 'N/A'); ?></p>
-            <p><span>Place of Assignment:</span> <?= htmlspecialchars($employee['place_of_assignment'] ?? 'N/A'); ?></p>
+            <p><span>Assigned Section:</span> <?= htmlspecialchars($employee['assigned_section'] ?? 'N/A'); ?></p>
             <p><span>Status:</span> <?= htmlspecialchars($employee['status']); ?></p>
 
         </div>
 
     </div>
 
-    <!-- DETAILS TABLE -->
+    <!-- DETAILS -->
     <div class="details-section">
-        <h3>Employment Details</h3>
 
-        <table>
-            <tr>
-                <th>Civil Service Eligibility</th>
-                <th>Position Title</th>
-                <th>Education</th>
-                <th>Salary Grade</th>
-                <th>Date of Appointment</th>
-                <th>Length of Service</th>
-            </tr>
+        <h3 class="section-title">Employee Details</h3>
 
-            <tr>
-                <td><?= htmlspecialchars($employee['civil_service_eligibility'] ?? 'N/A'); ?></td>
-                <td><?= htmlspecialchars($employee['position_title'] ?? 'N/A'); ?></td>
-                <td><?= htmlspecialchars($employee['education'] ?? 'N/A'); ?></td>
-                <td><?= htmlspecialchars($employee['salary_grade'] ?? 'N/A'); ?></td>
-                <td><?= htmlspecialchars($employee['date_of_appointment'] ?? 'N/A'); ?></td>
-                <td><?= htmlspecialchars($service); ?></td>
-            </tr>
-        </table>
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <label>Civil Service Eligibility</label>
+                <span><?= htmlspecialchars($employee['civil_service_eligibility'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Position Title</label>
+                <span><?= htmlspecialchars($employee['position_title'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Education</label>
+                <span><?= htmlspecialchars($employee['education'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Monthly Salary</label>
+                <span><?= htmlspecialchars($employee['monthly_salary'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Salary Grade</label>
+                <span><?= htmlspecialchars($employee['salary_grade'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Date of Appointment</label>
+                <span><?= htmlspecialchars($employee['date_of_appointment'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Length of Service</label>
+                <span><?= htmlspecialchars($service); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Date of Last Promotion</label>
+                <span><?= htmlspecialchars($employee['date_of_last_appointment'] ?? 'N/A'); ?></span>
+            </div>
+
+            <div class="detail-item">
+                <label>Step Increment</label>
+                <span><?= htmlspecialchars($employee['step_increment'] ?? 'N/A'); ?></span>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
