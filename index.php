@@ -49,11 +49,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <link rel="stylesheet" href="assets/css/style.css">
 
 <style>
+            body{
+            font-family:Arial, sans-serif;
+            background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+            url('assets/images/cenro.jpeg');
+            background-size:cover;
+            background-position:center;
+            background-repeat:no-repeat;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
 /* BACKDROP */
 .loader-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.13);
     display: none;
     justify-content: center;
     align-items: center;
@@ -102,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="login-container">
     <img src="assets/images/denr remv bg.png" alt="DENR Logo">
 
-    <h2>Login</h2>
+    <h2>Admin Login</h2>
 
     <?php if (!empty($error)): ?>
         <p style="color:red;"><?php echo $error; ?></p>
