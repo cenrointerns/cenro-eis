@@ -1,149 +1,392 @@
 <?php include "config.php"; ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Upload Employee Document</title>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-       body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    background-image: url('./assets/images/cenro.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-
-    opacity: 0.3; /* Adjust transparency here */
-    
-    z-index: -1;
-}
-
-        .container {
-            max-width: 650px;
-            margin: 60px auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        :root {
+            --forest:    #1e3a2f;
+            --forest-mid:#2d5240;
+            --forest-lt: #3a6b50;
+            --sage:      #6a9e7f;
+            --mint:      #a8d5b5;
+            --lime:      #c5e8a0;
+            --cream:     #f4f0e6;
+            --bark:      #5c4a2a;
+            --text:      #1e3a2f;
+            --muted:     #5a7a65;
+            --card-bg:   rgba(255,253,245,0.92);
+            --border:    rgba(106,158,127,0.35);
+            --accent:    #3a8c5c;
+            --accent-glow: rgba(58,140,92,0.2);
+            --success:   #2e7d4f;
+            --error:     #c0392b;
         }
 
-        h2 {
-            text-align: center;
-            color: #2c3e50;
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--forest);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
 
-        .subtext {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 13px;
-            margin-bottom: 25px;
+        body::before {
+            content: "";
+            position: fixed; inset: 0;
+            background-image: url('./assets/images/cenro.jpeg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.12;
+            z-index: 0;
+        }
+        body::after {
+            content: "";
+            position: fixed; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 10% 10%, rgba(168,213,181,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 90% 90%, rgba(58,107,80,0.25) 0%, transparent 60%);
+            z-index: 0;
         }
 
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 15px;
-            margin-bottom: 5px;
+        .page-wrap { position: relative; z-index: 1; width: 100%; max-width: 640px; }
+
+        .org-badge { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; animation: fadeDown 0.5s ease both; }
+        .org-badge .leaf { color: var(--lime); font-size: 14px; }
+        .org-badge span { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--mint); letter-spacing: 0.15em; text-transform: uppercase; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 38px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6);
+            animation: fadeUp 0.5s ease 0.1s both;
         }
 
-        select, input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
+        .card-header { margin-bottom: 28px; }
+        .card-header h1 { font-size: 21px; font-weight: 800; color: var(--forest); display: flex; align-items: center; gap: 12px; }
+        .icon-wrap { width: 42px; height: 42px; background: linear-gradient(135deg, var(--accent), var(--forest-lt)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #fff; box-shadow: 0 4px 14px var(--accent-glow); flex-shrink: 0; }
+        .card-header p { margin-top: 6px; margin-left: 54px; font-size: 13px; color: var(--muted); }
 
-        .btn {
-            width: 100%;
-            margin-top: 20px;
-            padding: 12px;
-            background: #4e73df;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+        .steps { display: flex; align-items: center; margin-bottom: 28px; }
+        .step { display: flex; align-items: center; gap: 7px; flex: 1; }
+        .step-num { width: 28px; height: 28px; border-radius: 50%; background: #e8f0eb; border: 2px solid #c5dac9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--muted); transition: all 0.3s ease; flex-shrink: 0; }
+        .step-label { font-size: 11px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+        .step-line { flex: 1; height: 2px; background: #d4e6d9; margin: 0 6px; border-radius: 99px; transition: background 0.3s; }
+        .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 10px var(--accent-glow); }
+        .step.active .step-label { color: var(--accent); }
+        .step.done .step-num { background: var(--forest); border-color: var(--forest); color: #fff; }
+        .step.done .step-label { color: var(--forest); }
+        .step.done + .step-line { background: var(--forest); }
 
-        .btn:hover {
-            background: #2e59d9;
-        }
+        .field { margin-bottom: 20px; }
+        label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--forest-mid); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
 
-        .back {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #3498db;
-            text-decoration: none;
-        }
+        select { width: 100%; padding: 11px 15px; background: #fff; border: 1.5px solid #c5dac9; border-radius: 10px; color: var(--text); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236a9e7f' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
+        select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+        #employee-preview { margin-top: 10px; padding: 11px 15px; background: rgba(58,140,92,0.07); border: 1.5px solid rgba(58,140,92,0.2); border-radius: 10px; display: none; align-items: center; gap: 12px; animation: fadeIn 0.3s ease; }
+        #employee-preview .avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--forest)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0; }
+        #employee-preview .info { flex: 1; }
+        #employee-preview .emp-name { font-size: 13px; font-weight: 700; color: var(--forest); }
+        #employee-preview .emp-id { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+        #employee-preview .check { color: var(--success); font-size: 15px; }
+
+        .doc-pill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; margin-top: 8px; }
+        .doc-pill { padding: 8px 10px; border: 1.5px solid #c5dac9; border-radius: 8px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s ease; user-select: none; }
+        .doc-pill:hover { border-color: var(--accent); color: var(--accent); background: rgba(58,140,92,0.06); }
+        .doc-pill.selected { border-color: var(--accent); background: var(--accent); color: #fff; box-shadow: 0 3px 10px var(--accent-glow); }
+
+        .drop-zone { border: 2px dashed #b8d4be; border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.25s ease; position: relative; background: #fafff8; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(58,140,92,0.04); }
+        .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .drop-zone .dz-icon { font-size: 30px; color: var(--sage); margin-bottom: 10px; transition: color 0.2s, transform 0.2s; }
+        .drop-zone:hover .dz-icon { color: var(--accent); transform: translateY(-3px); }
+        .drop-zone .dz-title { font-size: 14px; font-weight: 700; color: var(--forest); margin-bottom: 4px; }
+        .drop-zone .dz-sub { font-size: 12px; color: var(--muted); }
+        .drop-zone .dz-sub span { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+
+        #file-preview { display: none; margin-top: 10px; padding: 11px 15px; background: rgba(58,140,92,0.07); border: 1.5px solid rgba(58,140,92,0.2); border-radius: 10px; align-items: center; gap: 12px; animation: fadeIn 0.3s ease; }
+        #file-preview .file-icon { font-size: 22px; }
+        #file-preview .file-info { flex: 1; }
+        #file-preview .file-name { font-size: 13px; font-weight: 700; color: var(--forest); word-break: break-all; }
+        #file-preview .file-size { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        #file-preview .remove-file { color: var(--error); cursor: pointer; font-size: 14px; padding: 4px; border-radius: 4px; transition: background 0.2s; }
+        #file-preview .remove-file:hover { background: rgba(192,57,43,0.1); }
+
+        #upload-progress { display: none; margin-top: 14px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+        .progress-bar { height: 6px; background: #d4e6d9; border-radius: 99px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--lime)); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
+
+        .btn-submit { width: 100%; margin-top: 24px; padding: 15px; background: linear-gradient(135deg, var(--accent) 0%, var(--forest) 100%); color: #fff; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 6px 20px var(--accent-glow); }
+        .btn-submit::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent); }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px var(--accent-glow); }
+        .btn-submit:active { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+        .btn-inner { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .spinner { display: none; width: 17px; height: 17px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+
+        .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 0; }
+        .divider hr { flex: 1; border: none; border-top: 1px solid #d4e6d9; }
+        .divider span { font-size: 11px; color: #aac4b0; }
+        .back-link { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.2s; }
+        .back-link:hover { color: var(--accent); }
+
+        #toast { position: fixed; bottom: 28px; right: 28px; padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 9px; transform: translateY(80px); opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 999; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+        #toast.success { background: rgba(46,125,79,0.1); border: 1px solid var(--success); color: var(--success); }
+        #toast.error { background: rgba(192,57,43,0.1); border: 1px solid var(--error); color: var(--error); }
+
+        @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+        @keyframes spin     { to { transform: rotate(360deg); } }
     </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="page-wrap">
 
-    <h2><i class="fas fa-upload"></i> Upload Employee Document</h2>
-    <div class="subtext">Select employee and upload HR document</div>
+    <div class="org-badge">
+        <i class="fas fa-leaf leaf"></i>
+        <span>CENRO &nbsp;·&nbsp; HR Document System</span>
+    </div>
 
-    <form action="upload.php" method="POST" enctype="multipart/form-data">
+    <div class="card">
+        <div class="card-header">
+            <h1>
+                <div class="icon-wrap"><i class="fas fa-file-arrow-up"></i></div>
+                Upload Employee Document
+            </h1>
+            <p>Select an employee and attach an HR document for records.</p>
+        </div>
 
-        <!-- Employee -->
-        <label>Select Employee</label>
-        <select name="employee_id" required>
-            <option value="">-- Select Employee --</option>
+        <div class="steps">
+            <div class="step active" id="step1"><div class="step-num">1</div><div class="step-label">Employee</div></div>
+            <div class="step-line" id="line1"></div>
+            <div class="step" id="step2"><div class="step-num">2</div><div class="step-label">Document</div></div>
+            <div class="step-line" id="line2"></div>
+            <div class="step" id="step3"><div class="step-num">3</div><div class="step-label">File</div></div>
+        </div>
 
-            <?php
-            $sql = "SELECT employee_id, name FROM employees ORDER BY name ASC";
-            $result = $conn->query($sql);
+        <form action="upload.php" method="POST" enctype="multipart/form-data" id="uploadForm">
 
-            while ($row = $result->fetch_assoc()) {
-                echo "<option value='{$row['employee_id']}'>
-                        {$row['employee_id']} - {$row['name']}
-                      </option>";
-            }
-            ?>
-        </select>
+            <!-- Employee -->
+            <div class="field">
+                <label><i class="fas fa-user"></i> Select Employee</label>
+                <select name="employee_id" id="employee_id" required onchange="handleEmployeeChange(this)">
+                    <option value="">-- Select Employee --</option>
+                    <?php
+                    $sql = "SELECT employee_id, name FROM employees ORDER BY name ASC";
+                    $result = $conn->query($sql);
+                    while ($row = $result->fetch_assoc()) {
+                        $eid  = htmlspecialchars($row['employee_id']);
+                        $name = htmlspecialchars($row['name']);
+                        echo "<option value='$eid' data-name='$name'>$eid - $name</option>";
+                    }
+                    ?>
+                </select>
+                <div id="employee-preview">
+                    <div class="avatar" id="emp-avatar">?</div>
+                    <div class="info">
+                        <div class="emp-name" id="emp-name-display">—</div>
+                        <div class="emp-id"   id="emp-id-display">—</div>
+                    </div>
+                    <i class="fas fa-circle-check check"></i>
+                </div>
+            </div>
 
-        <!-- Document Type -->
-        <label>Document Type</label>
-        <select name="document_type" required>
-            <option value="">-- Select Document Type --</option>
-            <option value="PDS">PDS</option>
-            <option value="SALN">SALN</option>
-            <option value="IPC">IPC</option>
-            <option value="OPC">OPC</option>
-            <option value="IPCR">IPCR</option>
-            <option value="OPCR">OPCR</option>
-            <option value="Special Order">Special Order</option>
-            <option value="Reporting for Duty">Reporting for Duty</option>
-            <option value="Memorandum">Memorandum</option>
-            <option value="IDP">IDP</option>
-            <option value="Appointment">Appointment</option>
-            <option value="Office Clearance">Office Clearance</option>
-        </select>
+            <!-- Document Type -->
+            <div class="field">
+                <label><i class="fas fa-tag"></i> Document Type</label>
+                <div class="doc-pill-grid" id="doc-pills">
+                    <?php
+                    $docTypes = ["PDS","SALN","IPC","OPC","IPCR","OPCR","Special Order",
+                                 "Reporting for Duty","Memorandum","IDP","Appointment","Office Clearance"];
+                    foreach ($docTypes as $dt) {
+                        $safe = htmlspecialchars($dt);
+                        echo "<div class='doc-pill' onclick='selectDocType(this, \"$safe\")'>$safe</div>";
+                    }
+                    ?>
+                </div>
+                <!-- Real select — hidden but always submitted with the form -->
+                <select name="document_type" id="document_type" required style="margin-top:10px;display:none;">
+                    <option value="">-- Select Document Type --</option>
+                    <?php foreach ($docTypes as $dt): $safe = htmlspecialchars($dt); ?>
+                        <option value="<?= $safe ?>"><?= $safe ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-        <!-- File -->
-        <label>Choose File</label>
-        <input type="file" name="document" accept=".pdf,.doc,.docx" required>
+            <!-- File -->
+            <div class="field">
+                <label><i class="fas fa-paperclip"></i> Choose File</label>
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" name="document" id="fileInput" accept=".pdf,.doc,.docx" required onchange="handleFile(this)">
+                    <div class="dz-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                    <div class="dz-title">Drag & drop or click to browse</div>
+                    <div class="dz-sub">Accepted: <span>.pdf .doc .docx</span> &nbsp;·&nbsp; Max <span>10 MB</span></div>
+                </div>
+                <div id="file-preview">
+                    <div class="file-icon" id="file-icon-display">📄</div>
+                    <div class="file-info">
+                        <div class="file-name" id="file-name-display">—</div>
+                        <div class="file-size" id="file-size-display">—</div>
+                    </div>
+                    <div class="remove-file" onclick="removeFile()"><i class="fas fa-xmark"></i></div>
+                </div>
+                <div id="upload-progress">
+                    <div class="progress-label"><span>Uploading…</span><span id="progress-pct">0%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                </div>
+            </div>
 
-        <button type="submit" class="btn">
-            <i class="fas fa-upload"></i> Upload Document
-        </button>
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <span class="btn-inner">
+                    <i class="fas fa-upload"></i>
+                    <span id="btn-text">Upload Document</span>
+                    <div class="spinner" id="spinner"></div>
+                </span>
+            </button>
+        </form>
 
-    </form>
-
-    <a href="dashboard.php" class="back">← Back to Documents</a>
-
+        <div class="divider"><hr><span>or</span><hr></div>
+        <a href="dashboard.php" class="back-link"><i class="fas fa-arrow-left"></i> Back to Documents</a>
+    </div>
 </div>
 
+<div id="toast"></div>
+
+<script>
+    function handleEmployeeChange(select) {
+        const preview = document.getElementById('employee-preview');
+        if (!select.value) { preview.style.display = 'none'; updateSteps(); return; }
+        const opt      = select.options[select.selectedIndex];
+        const name     = opt.dataset.name || opt.text.split(' - ').slice(1).join(' - ');
+        const initials = name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+        document.getElementById('emp-avatar').textContent       = initials;
+        document.getElementById('emp-name-display').textContent = name;
+        document.getElementById('emp-id-display').textContent   = 'ID: ' + select.value;
+        preview.style.display = 'flex';
+        updateSteps();
+    }
+
+    function selectDocType(pill, value) {
+        document.querySelectorAll('.doc-pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+        const sel = document.getElementById('document_type');
+        sel.value = value;   // sync to real <select> so it POSTs correctly
+        updateSteps();
+    }
+
+    function handleFile(input) {
+        if (!input.files.length) { removeFile(); return; }
+        const file = input.files[0];
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('error', 'File too large — maximum is 10 MB.');
+            input.value = ''; return;
+        }
+        const ext = file.name.split('.').pop().toLowerCase();
+        const icons = { pdf:'📕', doc:'📘', docx:'📘' };
+        document.getElementById('file-icon-display').textContent = icons[ext] || '📄';
+        document.getElementById('file-name-display').textContent = file.name;
+        document.getElementById('file-size-display').textContent = formatSize(file.size);
+        document.getElementById('file-preview').style.display    = 'flex';
+        document.getElementById('dropZone').style.borderColor    = 'var(--accent)';
+        updateSteps();
+    }
+
+    function removeFile() {
+        document.getElementById('fileInput').value            = '';
+        document.getElementById('file-preview').style.display = 'none';
+        document.getElementById('dropZone').style.borderColor = '';
+        updateSteps();
+    }
+
+    function formatSize(b) {
+        if (b < 1024)    return b + ' B';
+        if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+        return (b/1048576).toFixed(1) + ' MB';
+    }
+
+    function updateSteps() {
+        const empDone  = !!document.getElementById('employee_id').value;
+        const docDone  = !!document.getElementById('document_type').value;
+        const fileDone = !!document.getElementById('fileInput').files.length;
+        setStep('step1', empDone  ? 'done' : 'active');
+        setStep('step2', docDone  ? 'done' : (empDone  ? 'active' : ''));
+        setStep('step3', fileDone ? 'done' : (docDone  ? 'active' : ''));
+        document.getElementById('line1').style.background = empDone ? 'var(--forest)' : '';
+        document.getElementById('line2').style.background = docDone ? 'var(--forest)' : '';
+    }
+
+    function setStep(id, state) {
+        const el = document.getElementById(id);
+        el.classList.remove('active','done');
+        if (state) el.classList.add(state);
+        el.querySelector('.step-num').innerHTML = state === 'done'
+            ? '<i class="fas fa-check" style="font-size:10px"></i>'
+            : id.replace('step','');
+    }
+
+    const dz = document.getElementById('dropZone');
+    dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', ()  => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+        e.preventDefault(); dz.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            document.getElementById('fileInput').files = e.dataTransfer.files;
+            handleFile(document.getElementById('fileInput'));
+        }
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        const emp  = document.getElementById('employee_id').value;
+        const doc  = document.getElementById('document_type').value;
+        const file = document.getElementById('fileInput').files.length;
+        if (!emp || !doc || !file) {
+            e.preventDefault();
+            showToast('error', 'Please complete all three fields before uploading.');
+            return;
+        }
+        document.getElementById('submitBtn').disabled           = true;
+        document.getElementById('btn-text').textContent         = 'Uploading…';
+        document.getElementById('spinner').style.display        = 'block';
+        document.getElementById('upload-progress').style.display = 'block';
+        simulateProgress();
+    });
+
+    function simulateProgress() {
+        let pct = 0;
+        const fill = document.getElementById('progress-fill');
+        const lbl  = document.getElementById('progress-pct');
+        const iv = setInterval(() => {
+            pct = Math.min(pct + Math.random() * 18, 90);
+            fill.style.width = pct + '%';
+            lbl.textContent  = Math.round(pct) + '%';
+            if (pct >= 90) clearInterval(iv);
+        }, 200);
+    }
+
+    function showToast(type, msg) {
+        const t = document.getElementById('toast');
+        t.className = 'show ' + type;
+        t.innerHTML = `<i class="fas fa-${type==='success'?'circle-check':'circle-exclamation'}"></i> ${msg}`;
+        setTimeout(() => t.classList.remove('show'), 3500);
+    }
+</script>
 </body>
 </html>
