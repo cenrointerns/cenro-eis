@@ -146,16 +146,12 @@ if(isset($_POST['send_otp'])){
 
         body{
             font-family:Arial, sans-serif;
-
             background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
             url('assets/images/bg_cenro.jpeg');
-
             background-size:cover;
             background-position:center;
             background-repeat:no-repeat;
-
             height:100vh;
-
             display:flex;
             justify-content:center;
             align-items:center;
