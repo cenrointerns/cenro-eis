@@ -465,6 +465,10 @@ textarea { resize: none; line-height: 1.65; }
         Back to Dashboard
     </a>
 
+    <a href="manage_announcements.php" style="display: inline-flex; align-items: center; gap: 8px; color: var(--forest); font-size: 13px; font-weight: 500; text-decoration: none; margin-left: 20px;">
+    📋 Manage Announcements
+</a>
+
     <div class="page-title">
         <div class="eyebrow">Communications</div>
         <h1>New Announcement</h1>
