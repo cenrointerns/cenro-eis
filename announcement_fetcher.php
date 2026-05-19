@@ -218,7 +218,7 @@ body {
     <?php endif; ?>
 
     <?php if(!$row['is_read']): ?>
-       
+        
     <?php else: ?>
         <button class="btn read-btn" disabled>✔ Read</button>
     <?php endif; ?>

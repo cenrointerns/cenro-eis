@@ -2,57 +2,149 @@
 session_start();
 include 'config.php';
 
-$email = $_GET['email'] ?? '';
-
-if (!$email) {
-    die("Invalid request");
-}
-
 $message = "";
 
-if (isset($_POST['verify'])) {
+if(!isset($_SESSION['reset_email'])){
+    header("Location: reset_password.php");
+    exit();
+}
 
+$email = $_SESSION['reset_email'];
+
+if(isset($_POST['verify'])){
+
+    // REMOVE SPACES
     $otp = trim($_POST['otp']);
 
-    $stmt = $conn->prepare("
-        SELECT employee_login_id 
-        FROM employees_login 
-        WHERE email = ? 
-        AND reset_otp = ? 
-        AND otp_expiry > NOW()
+    // DEBUGGING QUERY
+    $query = mysqli_query($conn, "
+        SELECT * FROM employees_login 
+        WHERE email='$email'
+        AND reset_otp='$otp'
     ");
 
-    $stmt->bind_param("ss", $email, $otp);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    if(mysqli_num_rows($query) > 0){
 
-    if ($result->num_rows > 0) {
+        $row = mysqli_fetch_assoc($query);
 
-        $_SESSION['reset_email'] = $email;
+        // CHECK EXPIRY MANUALLY
+        $current_time = date("Y-m-d H:i:s");
 
-        // OPTIONAL: clear OTP after success (recommended)
-        $clear = $conn->prepare("
-            UPDATE employees_login 
-            SET reset_otp = NULL, otp_expiry = NULL 
-            WHERE email = ?
-        ");
-        $clear->bind_param("s", $email);
-        $clear->execute();
+        if($row['otp_expiry'] > $current_time){
 
-        header("Location: reset_password.php");
-        exit();
+            $_SESSION['otp_verified'] = true;
 
-    } else {
-        $message = "Invalid or expired OTP!";
+            header("Location: new_password.php");
+            exit();
+
+        }else{
+
+            $message = "OTP already expired!";
+        }
+
+    }else{
+
+        $message = "Invalid OTP!";
     }
 }
 ?>
 
-<form method="POST">
-    <h3>Enter OTP</h3>
-    <p style="color:red;"><?php echo $message; ?></p>
+<!DOCTYPE html>
+<html>
+<head>
 
-    <input type="text" name="otp" placeholder="6-digit OTP" required>
+    <title>Verify OTP</title>
 
-    <button type="submit" name="verify">Verify</button>
-</form>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial, sans-serif;
+            background:#f1f1f1;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .container{
+            width:350px;
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0px 0px 15px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:20px;
+            color:#2e7d32;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin-top:10px;
+            border:1px solid #ccc;
+            border-radius:8px;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            background:#2e7d32;
+            color:white;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#1b5e20;
+        }
+
+        .message{
+            text-align:center;
+            color:red;
+            margin-bottom:10px;
+            font-weight:bold;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Verify OTP</h2>
+
+    <p class="message"><?php echo $message; ?></p>
+
+    <form method="POST">
+
+        <input type="text" 
+               name="otp" 
+               placeholder="Enter 6-digit OTP"
+               maxlength="6"
+               required>
+
+        <button type="submit" name="verify">
+            Verify OTP
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
+
+
+
+
