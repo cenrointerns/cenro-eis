@@ -512,7 +512,7 @@ body::before {
 /* ── DETAILS GRID ── */
 .details-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .detail-item {
@@ -690,12 +690,12 @@ body::before {
                         <span class="meta-value">SG-<?php echo $employee['salary_grade']; ?></span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">Length of Service</span>
-                        <span class="meta-value"><?php echo htmlspecialchars($employee['length_of_service']); ?></span>
+                        <span class="meta-label">Monthly Salary</span>
+                        <span class="meta-value">₱<?php echo htmlspecialchars($employee['monthly_salary']); ?></span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">Appointed</span>
-                        <span class="meta-value"><?php echo htmlspecialchars($employee['date_of_appointment']); ?></span>
+                        <span class="meta-label">Length of Service</span>
+                        <span class="meta-value"><?php echo htmlspecialchars($employee['length_of_service']); ?></span>
                     </div>
                 </div>
             </div>
@@ -743,6 +743,34 @@ body::before {
                     <div class="detail-icon">📜</div>Civil Service Eligibility
                 </div>
                 <div class="detail-value"><?php echo htmlspecialchars($employee['civil_service_eligibility']); ?></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">
+                    <div class="detail-icon">📆</div>Date of Appointment
+                </div>
+                <div class="detail-value"><?php echo htmlspecialchars($employee['date_of_appointment']); ?></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">
+                    <div class="detail-icon">📈</div>Date of Last Promotion
+                </div>
+                <div class="detail-value"><?php echo htmlspecialchars($employee['date_of_last_promotion']); ?></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">
+                    <div class="detail-icon">⚡</div>Step Increment
+                </div>
+                <div class="detail-value"><?php echo htmlspecialchars($employee['step_increment']); ?></div>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">
+                    <div class="detail-icon">📅</div>Member Since
+                </div>
+                <div class="detail-value"><?php echo date('F d, Y', strtotime($employee['created_at'])); ?></div>
             </div>
 
         </div>
