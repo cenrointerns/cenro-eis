@@ -1,4 +1,11 @@
-<?php include "config.php"; ?>
+<?php 
+include "config.php"; 
+
+// Check for success/error messages
+$success = isset($_GET['success']) ? $_GET['success'] : '';
+$error = isset($_GET['error']) ? $_GET['error'] : '';
+$message = isset($_GET['message']) ? $_GET['message'] : '';
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +46,7 @@
             align-items: center;
             justify-content: center;
             padding: 40px 20px;
+            position: relative;
         }
 
         body::before {
@@ -108,6 +116,28 @@
         .doc-pill { padding: 8px 10px; border: 1.5px solid #c5dac9; border-radius: 8px; background: #fff; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s ease; user-select: none; }
         .doc-pill:hover { border-color: var(--accent); color: var(--accent); background: rgba(58,140,92,0.06); }
         .doc-pill.selected { border-color: var(--accent); background: var(--accent); color: #fff; box-shadow: 0 3px 10px var(--accent-glow); }
+        
+        .others-input-group {
+            margin-top: 12px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .others-input-group input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1.5px solid var(--accent);
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            background: #fff;
+            transition: all 0.2s ease;
+        }
+        .others-input-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
 
         .drop-zone { border: 2px dashed #b8d4be; border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.25s ease; position: relative; background: #fafff8; }
         .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(58,140,92,0.04); }
@@ -132,9 +162,6 @@
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--lime)); border-radius: 99px; width: 0%; transition: width 0.3s ease; }
 
         .btn-submit { width: 100%; margin-top: 24px; padding: 15px; background: linear-gradient(135deg, var(--accent) 0%, var(--forest) 100%); color: #fff; border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 6px 20px var(--accent-glow); }
-        .btn-submit::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent); }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px var(--accent-glow); }
-        .btn-submit:active { transform: translateY(0); }
         .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
         .btn-inner { display: flex; align-items: center; justify-content: center; gap: 10px; }
         .spinner { display: none; width: 17px; height: 17px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
@@ -145,10 +172,23 @@
         .back-link { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.2s; }
         .back-link:hover { color: var(--accent); }
 
-        #toast { position: fixed; bottom: 28px; right: 28px; padding: 13px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 9px; transform: translateY(80px); opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 999; }
-        #toast.show { transform: translateY(0); opacity: 1; }
-        #toast.success { background: rgba(46,125,79,0.1); border: 1px solid var(--success); color: var(--success); }
-        #toast.error { background: rgba(192,57,43,0.1); border: 1px solid var(--error); color: var(--error); }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+        .alert-success {
+            background: rgba(46,125,79,0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        .alert-error {
+            background: rgba(192,57,43,0.15);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
 
         @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
         @keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
@@ -174,6 +214,16 @@
             <p>Select an employee and attach an HR document for records.</p>
         </div>
 
+        <?php if ($success): ?>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+        </div>
+        <?php elseif ($error): ?>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($message); ?>
+        </div>
+        <?php endif; ?>
+
         <div class="steps">
             <div class="step active" id="step1"><div class="step-num">1</div><div class="step-label">Employee</div></div>
             <div class="step-line" id="line1"></div>
@@ -184,7 +234,6 @@
 
         <form action="upload.php" method="POST" enctype="multipart/form-data" id="uploadForm">
 
-            <!-- Employee -->
             <div class="field">
                 <label><i class="fas fa-user"></i> Select Employee</label>
                 <select name="employee_id" id="employee_id" required onchange="handleEmployeeChange(this)">
@@ -209,29 +258,33 @@
                 </div>
             </div>
 
-            <!-- Document Type -->
             <div class="field">
                 <label><i class="fas fa-tag"></i> Document Type</label>
                 <div class="doc-pill-grid" id="doc-pills">
                     <?php
                     $docTypes = ["PDS","SALN","IPC","OPC","IPCR","OPCR","Special Order",
-                                 "Reporting for Duty","Memorandum","IDP","Appointment","Office Clearance"];
+                                 "Reporting for Duty","Memorandum","IDP","Appointment","Office Clearance","ITR"];
                     foreach ($docTypes as $dt) {
                         $safe = htmlspecialchars($dt);
                         echo "<div class='doc-pill' onclick='selectDocType(this, \"$safe\")'>$safe</div>";
                     }
                     ?>
+                    <div class='doc-pill' onclick='selectOthers()'>OTHERS: ___</div>
                 </div>
-                <!-- Real select — hidden but always submitted with the form -->
-                <select name="document_type" id="document_type" required style="margin-top:10px;display:none;">
+                
+                <div class="others-input-group" id="othersInputGroup">
+                    <input type="text" id="customDocType" placeholder="Enter document type..." oninput="updateCustomDocType(this.value)">
+                </div>
+                
+                <select name="document_type" id="document_type" required style="display:none;">
                     <option value="">-- Select Document Type --</option>
                     <?php foreach ($docTypes as $dt): $safe = htmlspecialchars($dt); ?>
                         <option value="<?= $safe ?>"><?= $safe ?></option>
                     <?php endforeach; ?>
+                    <option value="OTHERS">OTHERS</option>
                 </select>
             </div>
 
-            <!-- File -->
             <div class="field">
                 <label><i class="fas fa-paperclip"></i> Choose File</label>
                 <div class="drop-zone" id="dropZone">
@@ -268,9 +321,9 @@
     </div>
 </div>
 
-<div id="toast"></div>
-
 <script>
+    let customDocTypeValue = '';
+    
     function handleEmployeeChange(select) {
         const preview = document.getElementById('employee-preview');
         if (!select.value) { preview.style.display = 'none'; updateSteps(); return; }
@@ -285,10 +338,34 @@
     }
 
     function selectDocType(pill, value) {
+        document.getElementById('othersInputGroup').style.display = 'none';
+        document.getElementById('customDocType').value = '';
+        customDocTypeValue = '';
+        
         document.querySelectorAll('.doc-pill').forEach(p => p.classList.remove('selected'));
         pill.classList.add('selected');
         const sel = document.getElementById('document_type');
-        sel.value = value;   // sync to real <select> so it POSTs correctly
+        sel.value = value;
+        updateSteps();
+    }
+    
+    function selectOthers() {
+        document.querySelectorAll('.doc-pill').forEach(p => p.classList.remove('selected'));
+        const othersPill = event.target;
+        othersPill.classList.add('selected');
+        
+        document.getElementById('othersInputGroup').style.display = 'block';
+        document.getElementById('customDocType').focus();
+        
+        const sel = document.getElementById('document_type');
+        sel.value = 'OTHERS';
+        
+        customDocTypeValue = '';
+        updateSteps();
+    }
+    
+    function updateCustomDocType(value) {
+        customDocTypeValue = value.trim();
         updateSteps();
     }
 
@@ -296,8 +373,9 @@
         if (!input.files.length) { removeFile(); return; }
         const file = input.files[0];
         if (file.size > 10 * 1024 * 1024) {
-            showToast('error', 'File too large — maximum is 10 MB.');
-            input.value = ''; return;
+            alert('File too large — maximum is 10 MB.');
+            input.value = ''; 
+            return;
         }
         const ext = file.name.split('.').pop().toLowerCase();
         const icons = { pdf:'📕', doc:'📘', docx:'📘' };
@@ -324,7 +402,13 @@
 
     function updateSteps() {
         const empDone  = !!document.getElementById('employee_id').value;
-        const docDone  = !!document.getElementById('document_type').value;
+        let docDone  = !!document.getElementById('document_type').value;
+        
+        const docTypeSelect = document.getElementById('document_type');
+        if (docTypeSelect.value === 'OTHERS') {
+            docDone = !!customDocTypeValue;
+        }
+        
         const fileDone = !!document.getElementById('fileInput').files.length;
         setStep('step1', empDone  ? 'done' : 'active');
         setStep('step2', docDone  ? 'done' : (empDone  ? 'active' : ''));
@@ -337,9 +421,11 @@
         const el = document.getElementById(id);
         el.classList.remove('active','done');
         if (state) el.classList.add(state);
-        el.querySelector('.step-num').innerHTML = state === 'done'
-            ? '<i class="fas fa-check" style="font-size:10px"></i>'
-            : id.replace('step','');
+        if (state !== 'done') {
+            el.querySelector('.step-num').innerHTML = id.replace('step','');
+        } else {
+            el.querySelector('.step-num').innerHTML = '<i class="fas fa-check" style="font-size:10px"></i>';
+        }
     }
 
     const dz = document.getElementById('dropZone');
@@ -355,21 +441,39 @@
 
     document.getElementById('uploadForm').addEventListener('submit', function(e) {
         const emp  = document.getElementById('employee_id').value;
-        const doc  = document.getElementById('document_type').value;
+        let doc  = document.getElementById('document_type').value;
         const file = document.getElementById('fileInput').files.length;
-        if (!emp || !doc || !file) {
+        
+        if (doc === 'OTHERS' && !customDocTypeValue) {
             e.preventDefault();
-            showToast('error', 'Please complete all three fields before uploading.');
+            alert('Please enter a custom document type.');
             return;
         }
-        document.getElementById('submitBtn').disabled           = true;
-        document.getElementById('btn-text').textContent         = 'Uploading…';
-        document.getElementById('spinner').style.display        = 'block';
+        
+        if (!emp || !doc || !file) {
+            e.preventDefault();
+            alert('Please complete all three fields before uploading.');
+            return;
+        }
+        
+        // Add custom document type as hidden field if needed
+        if (doc === 'OTHERS' && customDocTypeValue) {
+            let customInput = document.getElementById('custom_document_type');
+            if (!customInput) {
+                customInput = document.createElement('input');
+                customInput.type = 'hidden';
+                customInput.name = 'custom_document_type';
+                customInput.id = 'custom_document_type';
+                this.appendChild(customInput);
+            }
+            customInput.value = customDocTypeValue;
+        }
+        
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('btn-text').textContent = 'Uploading…';
+        document.getElementById('spinner').style.display = 'block';
         document.getElementById('upload-progress').style.display = 'block';
-        simulateProgress();
-    });
-
-    function simulateProgress() {
+        
         let pct = 0;
         const fill = document.getElementById('progress-fill');
         const lbl  = document.getElementById('progress-pct');
@@ -379,14 +483,7 @@
             lbl.textContent  = Math.round(pct) + '%';
             if (pct >= 90) clearInterval(iv);
         }, 200);
-    }
-
-    function showToast(type, msg) {
-        const t = document.getElementById('toast');
-        t.className = 'show ' + type;
-        t.innerHTML = `<i class="fas fa-${type==='success'?'circle-check':'circle-exclamation'}"></i> ${msg}`;
-        setTimeout(() => t.classList.remove('show'), 3500);
-    }
+    });
 </script>
 </body>
 </html>
