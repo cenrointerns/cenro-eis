@@ -917,7 +917,7 @@ $cosCount = $conn->query("SELECT COUNT(*) as c FROM employees WHERE status='Cont
                 </tr>
             <?php else: ?>
                 <?php while($row = $result->fetch_assoc()): ?>
-                <tr onclick="window.location='employee_info.php?employee_id=<?= $row['employee_id'] ?>'" style="cursor: pointer;">
+                <tr onclick="window.location='employee_info_1.php?employee_id=<?= $row['employee_id'] ?>'" style="cursor: pointer;">
                     <td><?= $row['employee_id'] ?></td>
                     <td>
                         <?php if($row['image'] && file_exists($image_folder . $row['image'])): ?>
